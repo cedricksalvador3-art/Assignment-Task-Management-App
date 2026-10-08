@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="primary">#4F46E5</color>
+    <color name="primary_dark">#3730A3</color>
+    <color name="primary_light">#EEF2FF</color>
+
+    <color name="accent">#0EA5E9</color>
+    <color name="background">#F8FAFC</color>
+    <color name="card_bg">#FFFFFF</color>
+
+    <!-- Priority Colors -->
+    <color name="priority_high_bg">#FEE2E2</color>
+    <color name="priority_high_text">#DC2626</color>
+
+    <color name="priority_medium_bg">#FEF3C7</color>
+    <color name="priority_medium_text">#D97706</color>
+
+    <color name="priority_low_bg">#D1FAE5</color>
+    <color name="priority_low_text">#059669</color>
+
+    <!-- Status Colors -->
+    <color name="status_pending_bg">#DBEAFE</color>
+    <color name="status_pending_text">#2563EB</color>
+
+    <color name="status_in_progress_bg">#EDE9FE</color>
+    <color name="status_in_progress_text">#7C3AED</color>
+
+    <color name="status_completed_bg">#D1FAE5</color>
+    <color name="status_completed_text">#059669</color>
+
+    <!-- Text & Divider Colors -->
+    <color name="text_primary">#0F172A</color>
+    <color name="text_secondary">#64748B</color>
+    <color name="divider">#E2E8F0</color>
+    <color name="error_red">#EF4444</color>
+    <color name="warning_yellow">#F59E0B</color>
+</resources>

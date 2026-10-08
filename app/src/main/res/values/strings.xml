@@ -1,0 +1,42 @@
+<resources>
+    <string name="app_name">Task Master</string>
+    <string name="welcome_back">Welcome back,</string>
+    <string name="login_title">Sign In</string>
+    <string name="login_subtitle">Manage your assignments and tasks easily</string>
+    <string name="register_title">Create Account</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="full_name">Full Name</string>
+    <string name="email">Email Address</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="dont_have_account">Don\'t have an account? Sign Up</string>
+    <string name="already_have_account">Already have an account? Sign In</string>
+
+    <!-- Dashboard Strings -->
+    <string name="dashboard_title">Task Dashboard</string>
+    <string name="total_tasks">Total Tasks</string>
+    <string name="pending_tasks">Pending</string>
+    <string name="in_progress_tasks">In Progress</string>
+    <string name="completed_tasks">Completed</string>
+    <string name="due_soon_tasks">Due Soon</string>
+    <string name="overall_progress">Overall Task Completion</string>
+    <string name="add_new_task">+ Add New Task</string>
+    <string name="view_all_tasks">View All Tasks</string>
+    <string name="logout">Logout</string>
+
+    <!-- Task List & Form Strings -->
+    <string name="tasks">My Tasks</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="subject">Subject / Category</string>
+    <string name="due_date">Due Date</string>
+    <string name="priority">Priority</string>
+    <string name="status">Status</string>
+    <string name="search_tasks">Search tasks by title or subject...</string>
+    <string name="save_task">Save Task</string>
+    <string name="mark_completed">Mark Completed</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+</resources>
