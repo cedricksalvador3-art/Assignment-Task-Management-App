@@ -97,7 +97,7 @@ class LoginActivity : AppCompatActivity() {
                     binding.tilPassword.error = "Incorrect password"
                 }
                 is LoginResult.Locked -> {
-                    binding.btnLogin.isEnabled = false
+                    binding.btnLogin.isEnabled = true
                     binding.tvAttemptWarning.visibility = View.GONE
                     showAccountLockedDialog()
                 }
@@ -118,14 +118,6 @@ class LoginActivity : AppCompatActivity() {
 
         dialogView.findViewById<Button>(R.id.btn_dialog_ok).setOnClickListener {
             dialog.dismiss()
-            // Temporarily unlock after user acknowledges for demo ease
-            val username = binding.etUsername.text.toString().trim()
-            if (username.isNotEmpty()) {
-                lifecycleScope.launch {
-                    userRepository.unlockUserAccount(username)
-                    binding.btnLogin.isEnabled = true
-                }
-            }
         }
 
         dialog.show()

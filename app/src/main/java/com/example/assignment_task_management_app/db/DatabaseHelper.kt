@@ -16,7 +16,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     companion object {
         private const val DATABASE_NAME = "assignment_task_app.db"
-        private const val DATABASE_VERSION = 1
+        private const val DATABASE_VERSION = 2
 
         // Table Users
         private const val TABLE_USERS = "users"
@@ -27,6 +27,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         private const val KEY_PASSWORD = "passwordHash"
         private const val KEY_FAILED_ATTEMPTS = "failedAttempts"
         private const val KEY_IS_LOCKED = "isLocked"
+        private const val KEY_LOCKED_UNTIL = "lockedUntil"
 
         // Table Tasks
         private const val TABLE_TASKS = "tasks"
@@ -60,7 +61,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 $KEY_EMAIL TEXT NOT NULL,
                 $KEY_PASSWORD TEXT NOT NULL,
                 $KEY_FAILED_ATTEMPTS INTEGER DEFAULT 0,
-                $KEY_IS_LOCKED INTEGER DEFAULT 0
+                $KEY_IS_LOCKED INTEGER DEFAULT 0,
+                $KEY_LOCKED_UNTIL INTEGER DEFAULT 0
             )
         """.trimIndent()
 
@@ -95,6 +97,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             put(KEY_PASSWORD, "Password123")
             put(KEY_FAILED_ATTEMPTS, 0)
             put(KEY_IS_LOCKED, 0)
+            put(KEY_LOCKED_UNTIL, 0)
         }
         val userId = db.insert(TABLE_USERS, null, userValues)
 
@@ -102,8 +105,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             val now = System.currentTimeMillis()
             val dayMs = 24 * 60 * 60 * 1000L
 
-            // 28 sample tasks total to match reference UI stats:
-            // 11 Completed, 15 Pending/In-Progress, 2 Overdue
             val sampleTasks = mutableListOf<Task>()
 
             // Overdue tasks (2)
@@ -130,7 +131,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 )
             )
 
-            // Upcoming Pending Tasks (15 total pending)
+            // Upcoming Pending Tasks (15)
             sampleTasks.add(
                 Task(
                     userId = userId,
@@ -308,9 +309,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_TASKS")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_USERS")
-        onCreate(db)
+        if (oldVersion < 2) {
+            try {
+                db.execSQL("ALTER TABLE $TABLE_USERS ADD COLUMN $KEY_LOCKED_UNTIL INTEGER DEFAULT 0")
+            } catch (e: Exception) {
+                // Column might already exist
+            }
+        }
     }
 
     override fun onConfigure(db: SQLiteDatabase) {
@@ -359,6 +364,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             put(KEY_PASSWORD, user.passwordHash)
             put(KEY_FAILED_ATTEMPTS, user.failedAttempts)
             put(KEY_IS_LOCKED, if (user.isLocked) 1 else 0)
+            put(KEY_LOCKED_UNTIL, user.lockedUntil)
         }
         db.insert(TABLE_USERS, null, values)
     }
@@ -372,12 +378,20 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             put(KEY_PASSWORD, user.passwordHash)
             put(KEY_FAILED_ATTEMPTS, user.failedAttempts)
             put(KEY_IS_LOCKED, if (user.isLocked) 1 else 0)
+            put(KEY_LOCKED_UNTIL, user.lockedUntil)
         }
         val rows = db.update(TABLE_USERS, values, "$KEY_USER_ID = ?", arrayOf(user.id.toString()))
         rows > 0
     }
 
     private fun cursorToUser(cursor: Cursor): User {
+        val lockedUntilIndex = cursor.getColumnIndex(KEY_LOCKED_UNTIL)
+        val lockedUntil = if (lockedUntilIndex != -1 && !cursor.isNull(lockedUntilIndex)) {
+            cursor.getLong(lockedUntilIndex)
+        } else {
+            0L
+        }
+
         return User(
             id = cursor.getLong(cursor.getColumnIndexOrThrow(KEY_USER_ID)),
             username = cursor.getString(cursor.getColumnIndexOrThrow(KEY_USERNAME)),
@@ -385,7 +399,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             email = cursor.getString(cursor.getColumnIndexOrThrow(KEY_EMAIL)),
             passwordHash = cursor.getString(cursor.getColumnIndexOrThrow(KEY_PASSWORD)),
             failedAttempts = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_FAILED_ATTEMPTS)),
-            isLocked = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_IS_LOCKED)) == 1
+            isLocked = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_IS_LOCKED)) == 1,
+            lockedUntil = lockedUntil
         )
     }
 

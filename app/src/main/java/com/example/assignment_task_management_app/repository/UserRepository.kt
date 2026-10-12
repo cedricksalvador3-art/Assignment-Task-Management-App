@@ -6,11 +6,16 @@ import com.example.assignment_task_management_app.model.User
 sealed class LoginResult {
     data class Success(val user: User) : LoginResult()
     data class Failed(val message: String, val remainingAttempts: Int) : LoginResult()
-    data class Locked(val message: String) : LoginResult()
+    data class Locked(val message: String, val lockedUntil: Long = 0L) : LoginResult()
     data class Error(val message: String) : LoginResult()
 }
 
 class UserRepository(private val userDao: UserDao) {
+
+    companion object {
+        const val LOCKOUT_DURATION_MS = 5 * 60 * 1000L // 5 minutes temporary lockout
+        const val MAX_FAILED_ATTEMPTS = 3
+    }
 
     suspend fun registerUser(user: User): Result<Long> {
         return try {
@@ -37,35 +42,57 @@ class UserRepository(private val userDao: UserDao) {
 
     suspend fun loginUser(usernameOrEmail: String, passwordInput: String): LoginResult {
         return try {
-            val user = userDao.getUserByUsername(usernameOrEmail)
+            // 1. Validate if identifier matches an existing account in database
+            val existingUser = userDao.getUserByUsername(usernameOrEmail)
                 ?: userDao.getUserByEmail(usernameOrEmail)
                 ?: return LoginResult.Error("Account not found. Please register.")
 
-            if (user.isLocked) {
-                return LoginResult.Locked("Account locked due to 3 failed attempts. Please unlock or contact admin.")
+            val currentTime = System.currentTimeMillis()
+            var user = existingUser
+
+            // 2. Check if account is currently locked or lockout period is active
+            if (user.isLocked || user.lockedUntil > currentTime) {
+                if (user.lockedUntil > currentTime) {
+                    // Lockout period is active and has NOT expired yet
+                    return LoginResult.Locked(
+                        "Account temporarily locked in DueWise. Wait 5 minutes before trying again.",
+                        user.lockedUntil
+                    )
+                } else {
+                    // Lockout period HAS expired! Automatically reset counter & unlock account
+                    user = user.copy(failedAttempts = 0, isLocked = false, lockedUntil = 0L)
+                    userDao.updateUser(user)
+                }
             }
 
+            // 3. Verify password credentials for the registered account
             if (user.passwordHash == passwordInput) {
-                // Successful login -> Reset failed attempts
-                if (user.failedAttempts > 0) {
-                    val updatedUser = user.copy(failedAttempts = 0, isLocked = false)
-                    userDao.updateUser(updatedUser)
-                    LoginResult.Success(updatedUser)
-                } else {
-                    LoginResult.Success(user)
+                // Successful login -> Reset failed attempts counter to 0
+                if (user.failedAttempts > 0 || user.isLocked || user.lockedUntil > 0L) {
+                    user = user.copy(failedAttempts = 0, isLocked = false, lockedUntil = 0L)
+                    userDao.updateUser(user)
                 }
+                LoginResult.Success(user)
             } else {
-                // Password incorrect -> Increment failed attempts
+                // Incorrect password for valid registered account -> Increment failed attempts
                 val newFailedCount = user.failedAttempts + 1
-                if (newFailedCount >= 3) {
-                    val lockedUser = user.copy(failedAttempts = newFailedCount, isLocked = true)
+                if (newFailedCount >= MAX_FAILED_ATTEMPTS) {
+                    val lockedUntil = System.currentTimeMillis() + LOCKOUT_DURATION_MS
+                    val lockedUser = user.copy(
+                        failedAttempts = newFailedCount,
+                        isLocked = true,
+                        lockedUntil = lockedUntil
+                    )
                     userDao.updateUser(lockedUser)
-                    LoginResult.Locked("Account has been locked after 3 failed login attempts!")
+                    LoginResult.Locked(
+                        "Account temporarily locked in DueWise. Wait 5 minutes before trying again.",
+                        lockedUntil
+                    )
                 } else {
                     val updatedUser = user.copy(failedAttempts = newFailedCount)
                     userDao.updateUser(updatedUser)
-                    val remaining = 3 - newFailedCount
-                    LoginResult.Failed("Incorrect password. Attempt $newFailedCount of 3.", remaining)
+                    val remaining = MAX_FAILED_ATTEMPTS - newFailedCount
+                    LoginResult.Failed("Incorrect password. Attempt $newFailedCount of $MAX_FAILED_ATTEMPTS.", remaining)
                 }
             }
         } catch (e: Exception) {
@@ -78,7 +105,7 @@ class UserRepository(private val userDao: UserDao) {
             ?: userDao.getUserByEmail(usernameOrEmail)
             ?: return false
 
-        val unlocked = user.copy(failedAttempts = 0, isLocked = false)
+        val unlocked = user.copy(failedAttempts = 0, isLocked = false, lockedUntil = 0L)
         return userDao.updateUser(unlocked)
     }
 

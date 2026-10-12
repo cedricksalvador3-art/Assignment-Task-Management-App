@@ -7,5 +7,6 @@ data class User(
     val email: String,
     val passwordHash: String,
     val failedAttempts: Int = 0,
-    val isLocked: Boolean = false
+    val isLocked: Boolean = false,
+    val lockedUntil: Long = 0L
 )
