@@ -11,7 +11,10 @@ data class DashboardStats(
     val pendingTasks: Int = 0,
     val inProgressTasks: Int = 0,
     val completedTasks: Int = 0,
-    val dueSoonTasks: Int = 0,
+    val overdueTasks: Int = 0,
+    val highPriorityCount: Int = 0,
+    val mediumPriorityCount: Int = 0,
+    val lowPriorityCount: Int = 0,
     val completionPercentage: Int = 0
 )
 
@@ -78,7 +81,7 @@ class TaskRepository(private val taskDao: TaskDao) {
 
     suspend fun getSubjectsForUser(userId: Long): List<String> {
         val subjects = taskDao.getSubjectsForUser(userId).toMutableList()
-        val defaultSubjects = listOf("Mobile App Dev", "Database Systems", "Software Engineering", "Mathematics", "Physics", "General")
+        val defaultSubjects = listOf("History", "Mathematics", "Science", "English", "Programming")
         for (def in defaultSubjects) {
             if (!subjects.contains(def)) {
                 subjects.add(def)
@@ -90,20 +93,26 @@ class TaskRepository(private val taskDao: TaskDao) {
     suspend fun getDashboardStats(userId: Long): DashboardStats {
         val allTasks = taskDao.getTasksForUser(userId)
         val total = allTasks.size
-        val pending = allTasks.count { it.status == TaskStatus.PENDING }
-        val inProgress = allTasks.count { it.status == TaskStatus.IN_PROGRESS }
         val completed = allTasks.count { it.status == TaskStatus.COMPLETED }
-        val dueSoon = allTasks.count {
-            it.status != TaskStatus.COMPLETED && DateUtils.isDueSoon(it.dueDate)
-        }
+        val overdue = allTasks.count { it.status != TaskStatus.COMPLETED && DateUtils.isOverdue(it.dueDate) }
+        val pending = allTasks.count { it.status == TaskStatus.PENDING && !DateUtils.isOverdue(it.dueDate) }
+        val inProgress = allTasks.count { it.status == TaskStatus.IN_PROGRESS && !DateUtils.isOverdue(it.dueDate) }
+
+        val highCount = allTasks.count { it.priority == TaskPriority.HIGH }
+        val mediumCount = allTasks.count { it.priority == TaskPriority.MEDIUM }
+        val lowCount = allTasks.count { it.priority == TaskPriority.LOW }
+
         val percentage = if (total > 0) ((completed.toDouble() / total.toDouble()) * 100).toInt() else 0
 
         return DashboardStats(
             totalTasks = total,
-            pendingTasks = pending,
+            pendingTasks = pending + inProgress,
             inProgressTasks = inProgress,
             completedTasks = completed,
-            dueSoonTasks = dueSoon,
+            overdueTasks = overdue,
+            highPriorityCount = highCount,
+            mediumPriorityCount = mediumCount,
+            lowPriorityCount = lowCount,
             completionPercentage = percentage
         )
     }
@@ -111,7 +120,7 @@ class TaskRepository(private val taskDao: TaskDao) {
     suspend fun getDueSoonTasks(userId: Long): List<Task> {
         val allTasks = taskDao.getTasksForUser(userId)
         return allTasks.filter {
-            it.status != TaskStatus.COMPLETED && DateUtils.isDueSoon(it.dueDate, 48)
+            it.status != TaskStatus.COMPLETED
         }.sortedBy { it.dueDate }
     }
 }

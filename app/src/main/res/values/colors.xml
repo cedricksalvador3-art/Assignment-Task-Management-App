@@ -3,13 +3,25 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="primary">#4F46E5</color>
-    <color name="primary_dark">#3730A3</color>
-    <color name="primary_light">#EEF2FF</color>
+    <!-- Theme Colors based on DueWise Reference Design -->
+    <color name="navy_header">#1E2250</color>
+    <color name="navy_header_dark">#15183A</color>
+    <color name="navy_primary">#253B80</color>
+    <color name="navy_primary_dark">#182658</color>
+    <color name="navy_primary_light">#EAEFFC</color>
+    <color name="indigo_accent">#3F51B5</color>
 
-    <color name="accent">#0EA5E9</color>
-    <color name="background">#F8FAFC</color>
+    <color name="primary">#253B80</color>
+    <color name="primary_dark">#182658</color>
+    <color name="primary_light">#EAEFFC</color>
+    <color name="accent">#2563EB</color>
+
+    <color name="background">#F3F4F8</color>
+    <color name="background_light">#F3F4F8</color>
     <color name="card_bg">#FFFFFF</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="input_background">#F1F3F9</color>
+    <color name="input_stroke">#D0D5DD</color>
 
     <!-- Priority Colors -->
     <color name="priority_high_bg">#FEE2E2</color>
@@ -22,19 +34,29 @@
     <color name="priority_low_text">#059669</color>
 
     <!-- Status Colors -->
-    <color name="status_pending_bg">#DBEAFE</color>
-    <color name="status_pending_text">#2563EB</color>
+    <color name="status_pending_bg">#FEF3C7</color>
+    <color name="status_pending_text">#D97706</color>
 
-    <color name="status_in_progress_bg">#EDE9FE</color>
-    <color name="status_in_progress_text">#7C3AED</color>
+    <color name="status_in_progress_bg">#DBEAFE</color>
+    <color name="status_in_progress_text">#2563EB</color>
 
     <color name="status_completed_bg">#D1FAE5</color>
     <color name="status_completed_text">#059669</color>
 
-    <!-- Text & Divider Colors -->
-    <color name="text_primary">#0F172A</color>
+    <color name="status_overdue_bg">#FEE2E2</color>
+    <color name="status_overdue_text">#DC2626</color>
+
+    <!-- Text & Surface Colors -->
+    <color name="text_primary">#1E293B</color>
     <color name="text_secondary">#64748B</color>
+    <color name="text_muted">#94A3B8</color>
     <color name="divider">#E2E8F0</color>
-    <color name="error_red">#EF4444</color>
-    <color name="warning_yellow">#F59E0B</color>
+    <color name="error_red">#DC2626</color>
+    <color name="error_red_bg">#FEE2E2</color>
+    <color name="warning_yellow">#D97706</color>
+    <color name="success_green">#059669</color>
+
+    <!-- Nav Bar -->
+    <color name="nav_active">#253B80</color>
+    <color name="nav_inactive">#94A3B8</color>
 </resources>

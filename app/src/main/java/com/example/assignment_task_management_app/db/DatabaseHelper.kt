@@ -82,6 +82,229 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
         db.execSQL(createUsersTable)
         db.execSQL(createTasksTable)
+
+        seedDefaultData(db)
+    }
+
+    private fun seedDefaultData(db: SQLiteDatabase) {
+        // Create default user Jane Doe
+        val userValues = ContentValues().apply {
+            put(KEY_USERNAME, "janedoe")
+            put(KEY_FULL_NAME, "Jane Doe")
+            put(KEY_EMAIL, "jane.doe@email.com")
+            put(KEY_PASSWORD, "Password123")
+            put(KEY_FAILED_ATTEMPTS, 0)
+            put(KEY_IS_LOCKED, 0)
+        }
+        val userId = db.insert(TABLE_USERS, null, userValues)
+
+        if (userId > 0) {
+            val now = System.currentTimeMillis()
+            val dayMs = 24 * 60 * 60 * 1000L
+
+            // 28 sample tasks total to match reference UI stats:
+            // 11 Completed, 15 Pending/In-Progress, 2 Overdue
+            val sampleTasks = mutableListOf<Task>()
+
+            // Overdue tasks (2)
+            sampleTasks.add(
+                Task(
+                    userId = userId,
+                    title = "Physics Lab Report",
+                    description = "Complete velocity and projectile motion analysis section.",
+                    subject = "Science",
+                    dueDate = now - (1 * dayMs),
+                    priority = TaskPriority.HIGH,
+                    status = TaskStatus.PENDING
+                )
+            )
+            sampleTasks.add(
+                Task(
+                    userId = userId,
+                    title = "Potoir Lab Report",
+                    description = "Prepare data sheets and error calculation graph.",
+                    subject = "Science",
+                    dueDate = now - (2 * dayMs),
+                    priority = TaskPriority.HIGH,
+                    status = TaskStatus.PENDING
+                )
+            )
+
+            // Upcoming Pending Tasks (15 total pending)
+            sampleTasks.add(
+                Task(
+                    userId = userId,
+                    title = "History Essay",
+                    description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.",
+                    subject = "History",
+                    dueDate = now + (1 * dayMs),
+                    priority = TaskPriority.HIGH,
+                    status = TaskStatus.PENDING
+                )
+            )
+            sampleTasks.add(
+                Task(
+                    userId = userId,
+                    title = "Math Quiz",
+                    description = "Study calculus integration formulas and practice problem set 4.",
+                    subject = "Mathematics",
+                    dueDate = now + (2 * dayMs),
+                    priority = TaskPriority.MEDIUM,
+                    status = TaskStatus.PENDING
+                )
+            )
+            sampleTasks.add(
+                Task(
+                    userId = userId,
+                    title = "English Literature Review",
+                    description = "Read chapters 5 to 8 of To Kill a Mockingbird and write character analysis.",
+                    subject = "English",
+                    dueDate = now + (3 * dayMs),
+                    priority = TaskPriority.MEDIUM,
+                    status = TaskStatus.PENDING
+                )
+            )
+            sampleTasks.add(
+                Task(
+                    userId = userId,
+                    title = "Programming Project",
+                    description = "Implement Room database integration and repository pattern.",
+                    subject = "Programming",
+                    dueDate = now + (4 * dayMs),
+                    priority = TaskPriority.HIGH,
+                    status = TaskStatus.IN_PROGRESS
+                )
+            )
+            sampleTasks.add(
+                Task(
+                    userId = userId,
+                    title = "Chemistry Homework",
+                    description = "Solve periodic table trends exercise questions.",
+                    subject = "Science",
+                    dueDate = now + (5 * dayMs),
+                    priority = TaskPriority.LOW,
+                    status = TaskStatus.PENDING
+                )
+            )
+            sampleTasks.add(
+                Task(
+                    userId = userId,
+                    title = "Algebra Practice Set",
+                    description = "Quadratic equations homework assignment.",
+                    subject = "Mathematics",
+                    dueDate = now + (6 * dayMs),
+                    priority = TaskPriority.MEDIUM,
+                    status = TaskStatus.PENDING
+                )
+            )
+            sampleTasks.add(
+                Task(
+                    userId = userId,
+                    title = "World War II Summary",
+                    description = "Summarize causes and major turning points of WWII.",
+                    subject = "History",
+                    dueDate = now + (7 * dayMs),
+                    priority = TaskPriority.LOW,
+                    status = TaskStatus.PENDING
+                )
+            )
+            sampleTasks.add(
+                Task(
+                    userId = userId,
+                    title = "Data Structures Quiz",
+                    description = "Review binary search trees and heap sort algorithm.",
+                    subject = "Programming",
+                    dueDate = now + (8 * dayMs),
+                    priority = TaskPriority.HIGH,
+                    status = TaskStatus.PENDING
+                )
+            )
+            sampleTasks.add(
+                Task(
+                    userId = userId,
+                    title = "Grammar Exercise 3",
+                    description = "Complete clause identification exercises.",
+                    subject = "English",
+                    dueDate = now + (9 * dayMs),
+                    priority = TaskPriority.LOW,
+                    status = TaskStatus.PENDING
+                )
+            )
+            sampleTasks.add(
+                Task(
+                    userId = userId,
+                    title = "Biology Cell Structure",
+                    description = "Draw diagram of plant and animal cell organelles.",
+                    subject = "Science",
+                    dueDate = now + (10 * dayMs),
+                    priority = TaskPriority.MEDIUM,
+                    status = TaskStatus.PENDING
+                )
+            )
+            sampleTasks.add(
+                Task(
+                    userId = userId,
+                    title = "Geometry Proofs",
+                    description = "Triangle congruence proofs assignment.",
+                    subject = "Mathematics",
+                    dueDate = now + (11 * dayMs),
+                    priority = TaskPriority.MEDIUM,
+                    status = TaskStatus.PENDING
+                )
+            )
+            sampleTasks.add(
+                Task(
+                    userId = userId,
+                    title = "Android UI Layout",
+                    description = "Design Jetpack Compose/XML views for dashboard.",
+                    subject = "Programming",
+                    dueDate = now + (12 * dayMs),
+                    priority = TaskPriority.HIGH,
+                    status = TaskStatus.IN_PROGRESS
+                )
+            )
+            sampleTasks.add(
+                Task(
+                    userId = userId,
+                    title = "Ancient Greece Presentation",
+                    description = "Prepare slides on Athenian democracy.",
+                    subject = "History",
+                    dueDate = now + (13 * dayMs),
+                    priority = TaskPriority.MEDIUM,
+                    status = TaskStatus.PENDING
+                )
+            )
+
+            // Completed Tasks (11)
+            for (i in 1..11) {
+                sampleTasks.add(
+                    Task(
+                        userId = userId,
+                        title = "Completed Assignment #$i",
+                        description = "Successfully submitted assignment $i.",
+                        subject = if (i % 2 == 0) "Mathematics" else "History",
+                        dueDate = now - ((i + 2) * dayMs),
+                        priority = if (i % 3 == 0) TaskPriority.HIGH else if (i % 2 == 0) TaskPriority.MEDIUM else TaskPriority.LOW,
+                        status = TaskStatus.COMPLETED
+                    )
+                )
+            }
+
+            for (task in sampleTasks) {
+                val values = ContentValues().apply {
+                    put(KEY_TASK_USER_ID, task.userId)
+                    put(KEY_TITLE, task.title)
+                    put(KEY_DESCRIPTION, task.description)
+                    put(KEY_SUBJECT, task.subject)
+                    put(KEY_DUE_DATE, task.dueDate)
+                    put(KEY_PRIORITY, task.priority.name)
+                    put(KEY_STATUS, task.status.name)
+                    put(KEY_IS_REMINDER, 1)
+                    put(KEY_CREATED_AT, now)
+                }
+                db.insert(TABLE_TASKS, null, values)
+            }
+        }
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {

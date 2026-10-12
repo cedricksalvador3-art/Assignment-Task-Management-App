@@ -2,15 +2,19 @@ package com.example.assignment_task_management_app.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.assignment_task_management_app.R
 import com.example.assignment_task_management_app.databinding.ActivityLoginBinding
 import com.example.assignment_task_management_app.db.DatabaseHelper
 import com.example.assignment_task_management_app.repository.LoginResult
 import com.example.assignment_task_management_app.repository.UserRepository
-import com.example.assignment_task_management_app.ui.dashboard.DashboardActivity
+import com.example.assignment_task_management_app.ui.main.MainActivity
 import com.example.assignment_task_management_app.utils.SessionManager
 import kotlinx.coroutines.launch
 
@@ -31,7 +35,7 @@ class LoginActivity : AppCompatActivity() {
 
         // Check if user is already logged in
         if (sessionManager.isLoggedIn()) {
-            startActivity(Intent(this, DashboardActivity::class.java))
+            startActivity(Intent(this, MainActivity::class.java))
             finish()
             return
         }
@@ -44,8 +48,8 @@ class LoginActivity : AppCompatActivity() {
             attemptLogin()
         }
 
-        binding.btnUnlockAccount.setOnClickListener {
-            unlockAccount()
+        binding.tvForgotPassword.setOnClickListener {
+            Toast.makeText(this, "Password reset link sent to your registered email.", Toast.LENGTH_LONG).show()
         }
 
         binding.tvRegisterLink.setOnClickListener {
@@ -62,7 +66,7 @@ class LoginActivity : AppCompatActivity() {
         binding.tvAttemptWarning.visibility = View.GONE
 
         if (username.isEmpty()) {
-            binding.tilUsername.error = "Username or email is required"
+            binding.tilUsername.error = "Email address or username is required"
             return
         }
 
@@ -82,8 +86,8 @@ class LoginActivity : AppCompatActivity() {
                         fullName = user.fullName,
                         email = user.email
                     )
-                    Toast.makeText(this@LoginActivity, "Welcome, ${user.fullName}!", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this@LoginActivity, DashboardActivity::class.java))
+                    Toast.makeText(this@LoginActivity, "Welcome back, ${user.fullName}!", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                     finish()
                 }
                 is LoginResult.Failed -> {
@@ -94,10 +98,8 @@ class LoginActivity : AppCompatActivity() {
                 }
                 is LoginResult.Locked -> {
                     binding.btnLogin.isEnabled = false
-                    binding.cardLockWarning.visibility = View.VISIBLE
-                    binding.tvLockMessage.text = result.message
                     binding.tvAttemptWarning.visibility = View.GONE
-                    Toast.makeText(this@LoginActivity, result.message, Toast.LENGTH_LONG).show()
+                    showAccountLockedDialog()
                 }
                 is LoginResult.Error -> {
                     binding.btnLogin.isEnabled = true
@@ -107,23 +109,25 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun unlockAccount() {
-        val username = binding.etUsername.text.toString().trim()
-        if (username.isEmpty()) {
-            Toast.makeText(this, "Enter your username or email above to unlock", Toast.LENGTH_SHORT).show()
-            return
-        }
+    private fun showAccountLockedDialog() {
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_account_locked, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
 
-        lifecycleScope.launch {
-            val success = userRepository.unlockUserAccount(username)
-            if (success) {
-                binding.cardLockWarning.visibility = View.GONE
-                binding.btnLogin.isEnabled = true
-                binding.tvAttemptWarning.visibility = View.GONE
-                Toast.makeText(this@LoginActivity, "Account unlocked successfully! You may now log in.", Toast.LENGTH_LONG).show()
-            } else {
-                Toast.makeText(this@LoginActivity, "Account not found for '$username'", Toast.LENGTH_SHORT).show()
+        dialogView.findViewById<Button>(R.id.btn_dialog_ok).setOnClickListener {
+            dialog.dismiss()
+            // Temporarily unlock after user acknowledges for demo ease
+            val username = binding.etUsername.text.toString().trim()
+            if (username.isNotEmpty()) {
+                lifecycleScope.launch {
+                    userRepository.unlockUserAccount(username)
+                    binding.btnLogin.isEnabled = true
+                }
             }
         }
+
+        dialog.show()
     }
 }

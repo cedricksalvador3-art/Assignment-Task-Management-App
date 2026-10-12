@@ -2,6 +2,7 @@ package com.example.assignment_task_management_app.ui.auth
 
 import android.os.Bundle
 import android.util.Patterns
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -49,6 +50,7 @@ class RegisterActivity : AppCompatActivity() {
         binding.tilEmail.error = null
         binding.tilRegPassword.error = null
         binding.tilConfirmPassword.error = null
+        binding.tvMismatchWarning.visibility = View.GONE
 
         if (fullName.isEmpty()) {
             binding.tilFullName.error = "Full Name is required"
@@ -71,6 +73,7 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         if (password != confirmPassword) {
+            binding.tvMismatchWarning.visibility = View.VISIBLE
             binding.tilConfirmPassword.error = "Passwords do not match"
             return
         }

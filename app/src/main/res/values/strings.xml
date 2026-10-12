@@ -1,42 +1,95 @@
 <resources>
-    <string name="app_name">Task Master</string>
+    <string name="app_name">DueWise</string>
     <string name="welcome_back">Welcome back,</string>
+    <string name="welcome_back_duewise">Welcome back to DueWise</string>
+    <string name="create_your_duewise">Create your DueWise</string>
     <string name="login_title">Sign In</string>
     <string name="login_subtitle">Manage your assignments and tasks easily</string>
-    <string name="register_title">Create Account</string>
-    <string name="username">Username</string>
+    <string name="username_email">Email Address or Username</string>
     <string name="password">Password</string>
     <string name="full_name">Full Name</string>
     <string name="email">Email Address</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="login">Login</string>
+    <string name="sign_up">Sign Up</string>
     <string name="register">Register</string>
-    <string name="dont_have_account">Don\'t have an account? Sign Up</string>
-    <string name="already_have_account">Already have an account? Sign In</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="dont_have_account">Don\'t have an account? Sign Up.</string>
+    <string name="already_have_account">Already have an account? Login</string>
+    <string name="passwords_do_not_match">Passwords do not match</string>
+
+    <!-- Account Lockout -->
+    <string name="account_locked_title">Account Temporarily Locked in DueWise</string>
+    <string name="account_locked_message">Wait 5 minutes before trying again.</string>
+    <string name="ok">OK</string>
 
     <!-- Dashboard Strings -->
-    <string name="dashboard_title">Task Dashboard</string>
+    <string name="dashboard_title">Dashboard</string>
+    <string name="good_morning">Good Morning, %1$s!</string>
     <string name="total_tasks">Total Tasks</string>
-    <string name="pending_tasks">Pending</string>
-    <string name="in_progress_tasks">In Progress</string>
-    <string name="completed_tasks">Completed</string>
-    <string name="due_soon_tasks">Due Soon</string>
-    <string name="overall_progress">Overall Task Completion</string>
+    <string name="pending">Pending</string>
+    <string name="completed">Completed</string>
+    <string name="overdue">Overdue</string>
+    <string name="pending_tasks">Pending Tasks</string>
+    <string name="in_progress_tasks">In Progress Tasks</string>
+    <string name="completed_tasks">Completed Tasks</string>
+    <string name="my_progress">My Progress</string>
+    <string name="overall_progress">Overall Progress</string>
+    <string name="no_upcoming_deadlines">No upcoming deadlines</string>
+    <string name="upcoming_deadlines">Upcoming Deadlines</string>
+    <string name="see_all">See all</string>
     <string name="add_new_task">+ Add New Task</string>
     <string name="view_all_tasks">View All Tasks</string>
-    <string name="logout">Logout</string>
-
-    <!-- Task List & Form Strings -->
     <string name="tasks">My Tasks</string>
+    <string name="search_tasks">Search tasks...</string>
+
+    <!-- Task Management -->
+    <string name="my_assignments">My Assignments</string>
+    <string name="create_new_task">Create New Task</string>
+    <string name="edit_task">Edit Task</string>
+    <string name="task_details">Task Details</string>
     <string name="title">Title</string>
     <string name="description">Description</string>
-    <string name="subject">Subject / Category</string>
+    <string name="subject">Subject</string>
     <string name="due_date">Due Date</string>
     <string name="priority">Priority</string>
     <string name="status">Status</string>
-    <string name="search_tasks">Search tasks by title or subject...</string>
     <string name="save_task">Save Task</string>
-    <string name="mark_completed">Mark Completed</string>
-    <string name="edit">Edit</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="cancel">Cancel</string>
+    <string name="mark_as_completed">Mark as Completed</string>
+    <string name="update_status">Update Status</string>
+    <string name="delete_task">Delete Task</string>
+    <string name="delete_task_confirm">Are you sure you want to delete \'%1$s\'?</string>
     <string name="delete">Delete</string>
+    <string name="search">Search</string>
+
+    <!-- Progress Monitoring -->
+    <string name="progress_monitoring">Progress Monitoring</string>
+    <string name="summary_progress_subtitle">Summary graphs of summary and complete overall progress</string>
+    <string name="tasks_by_status">Tasks by Status</string>
+    <string name="tasks_by_priority">Tasks by Priority</string>
+    <string name="high">High</string>
+    <string name="medium">Medium</string>
+    <string name="low">Low</string>
+
+    <!-- Notifications & Reminders -->
+    <string name="notifications">Notifications</string>
+    <string name="my_reminders">My Reminders</string>
+
+    <!-- Profile & Settings -->
+    <string name="profile">Profile</string>
+    <string name="account_settings">Account Settings</string>
+    <string name="notification_preferences">Notification Preferences</string>
+    <string name="reminder_settings">Reminder Settings</string>
+    <string name="alert_settings">Alert Settings</string>
+    <string name="logout">Logout</string>
+    <string name="logout_confirm">Are you sure you want to log out of DueWise?</string>
+
+    <!-- Bottom Nav -->
+    <string name="nav_home">Home</string>
+    <string name="nav_tasks">My Tasks</string>
+    <string name="nav_progress">Progress</string>
+    <string name="nav_notifications">Notifications</string>
+    <string name="nav_profile">Profile</string>
 </resources>

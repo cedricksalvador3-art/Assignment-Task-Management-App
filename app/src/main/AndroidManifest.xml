@@ -34,11 +34,7 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".ui.dashboard.DashboardActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".ui.task.TaskListActivity"
+            android:name=".ui.main.MainActivity"
             android:exported="false" />
 
         <activity
