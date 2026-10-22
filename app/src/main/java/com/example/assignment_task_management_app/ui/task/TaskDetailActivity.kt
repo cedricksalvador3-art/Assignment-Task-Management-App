@@ -168,7 +168,7 @@ class TaskDetailActivity : AppCompatActivity() {
                 binding.tvDetailDescription.text = "No additional description provided."
             }
 
-            binding.tvDetailDueDate.text = DateUtils.formatDate(task.dueDate)
+            binding.tvDetailDueDate.text = DateUtils.formatDateTime(task.dueDate)
             binding.tvDetailRemaining.text = DateUtils.getRemainingTimeString(task.dueDate)
 
             // Priority badge styling

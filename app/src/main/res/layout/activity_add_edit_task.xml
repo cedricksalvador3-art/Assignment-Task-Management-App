@@ -101,7 +101,7 @@
                             android:textColor="@color/text_primary" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Subject Dropdown -->
+                    <!-- Subject Input Field -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -113,7 +113,7 @@
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/til_task_subject"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
@@ -122,12 +122,12 @@
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusTopStart="12dp">
 
-                        <AutoCompleteTextView
-                            android:id="@+id/actv_subject"
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_task_subject"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Select or type subject"
-                            android:inputType="text"
+                            android:hint="Enter subject (e.g. History, Math)"
+                            android:inputType="textCapWords"
                             android:textColor="@color/text_primary" />
                     </com.google.android.material.textfield.TextInputLayout>
 

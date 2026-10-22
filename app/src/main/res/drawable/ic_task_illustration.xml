@@ -1,0 +1,52 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="160dp"
+    android:height="140dp"
+    android:viewportWidth="160"
+    android:viewportHeight="140">
+  <!-- Background Board / Clipboard -->
+  <path
+      android:fillColor="#4F46E5"
+      android:pathData="M35,20 h90 a10,10 0 0,1 10,10 v100 a10,10 0 0,1 -10,10 h-90 a10,10 0 0,1 -10,-10 v-100 a10,10 0 0,1 10,-10 z"/>
+  <!-- Paper Sheet -->
+  <path
+      android:fillColor="#FFFFFF"
+      android:pathData="M42,30 h76 a5,5 0 0,1 5,5 v82 a5,5 0 0,1 -5,5 h-76 a5,5 0 0,1 -5,-5 v-82 a5,5 0 0,1 5,-5 z"/>
+  <!-- Clip Top -->
+  <path
+      android:fillColor="#1E1B4B"
+      android:pathData="M65,12 h30 a4,4 0 0,1 4,4 v10 h-38 v-10 a4,4 0 0,1 4,-4 z"/>
+  <!-- Checkbox 1 -->
+  <path
+      android:fillColor="#22C55E"
+      android:pathData="M52,48 h14 v14 h-14 z"/>
+  <path
+      android:fillColor="#FFFFFF"
+      android:pathData="M55,55 l3,3 l6,-6"
+      android:strokeWidth="2"
+      android:strokeColor="#FFFFFF"/>
+  <!-- Line 1 -->
+  <path
+      android:fillColor="#94A3B8"
+      android:pathData="M72,52 h38 v6 h-38 z"/>
+  <!-- Checkbox 2 -->
+  <path
+      android:fillColor="#22C55E"
+      android:pathData="M52,70 h14 v14 h-14 z"/>
+  <path
+      android:fillColor="#FFFFFF"
+      android:pathData="M55,77 l3,3 l6,-6"
+      android:strokeWidth="2"
+      android:strokeColor="#FFFFFF"/>
+  <!-- Line 2 -->
+  <path
+      android:fillColor="#94A3B8"
+      android:pathData="M72,74 h38 v6 h-38 z"/>
+  <!-- Checkbox 3 (pending) -->
+  <path
+      android:fillColor="#E2E8F0"
+      android:pathData="M52,92 h14 v14 h-14 z"/>
+  <!-- Line 3 -->
+  <path
+      android:fillColor="#CBD5E1"
+      android:pathData="M72,96 h28 v6 h-28 z"/>
+</vector>

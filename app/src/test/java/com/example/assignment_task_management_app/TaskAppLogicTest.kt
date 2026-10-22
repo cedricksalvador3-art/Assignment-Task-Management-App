@@ -190,5 +190,11 @@ class TaskAppLogicTest {
 
         assertTrue(DateUtils.isOverdue(pastDueMs))
         assertFalse(DateUtils.isOverdue(futureDueMs))
+
+        val diff5Mins = now + (5 * 60 * 1000)
+        assertEquals("5 mins left", DateUtils.getRemainingTimeString(diff5Mins))
+
+        val diff1Hour20Mins = now + ((1 * 60 * 60 * 1000) + (20 * 60 * 1000))
+        assertEquals("1 hr 20 mins left", DateUtils.getRemainingTimeString(diff1Hour20Mins))
     }
 }

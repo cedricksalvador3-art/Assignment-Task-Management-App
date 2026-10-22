@@ -83,8 +83,8 @@ class TaskAdapter(
                 }
             }
 
-            // Due Date
-            binding.tvItemDueDate.text = "Due " + DateUtils.formatDate(task.dueDate)
+            // Due Date & Time (Exact Deadline)
+            binding.tvItemDueDate.text = "Due: " + DateUtils.formatDateTime(task.dueDate)
 
             // Click listener
             binding.root.setOnClickListener { onItemClick(task) }

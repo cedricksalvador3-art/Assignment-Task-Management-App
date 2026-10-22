@@ -3,11 +3,9 @@ package com.example.assignment_task_management_app.ui.task
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.assignment_task_management_app.R
 import com.example.assignment_task_management_app.databinding.ActivityAddEditTaskBinding
 import com.example.assignment_task_management_app.db.DatabaseHelper
 import com.example.assignment_task_management_app.model.Task
@@ -28,9 +26,9 @@ class AddEditTaskActivity : AppCompatActivity() {
 
     private var taskId: Long = -1L
     private var userId: Long = -1L
-    private var selectedDueDateMs: Long = System.currentTimeMillis() + (24 * 60 * 60 * 1000) // Default tomorrow
 
-    private val calendar: Calendar = Calendar.getInstance()
+    private val calendar: Calendar = DateUtils.getPhilippineCalendar()
+    private var selectedDueDateMs: Long = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,8 +43,16 @@ class AddEditTaskActivity : AppCompatActivity() {
 
         taskId = intent.getLongExtra("EXTRA_TASK_ID", -1L)
 
+        // Default new task deadline: Tomorrow at 11:59 PM Philippine Time
+        calendar.timeInMillis = System.currentTimeMillis()
+        calendar.add(Calendar.DAY_OF_YEAR, 1)
+        calendar.set(Calendar.HOUR_OF_DAY, 23)
+        calendar.set(Calendar.MINUTE, 59)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        selectedDueDateMs = calendar.timeInMillis
+
         setupToolbar()
-        setupSubjectAutoComplete()
         setupDateTimePickers()
         setupListeners()
 
@@ -61,14 +67,6 @@ class AddEditTaskActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbarAddEditTask)
         binding.toolbarAddEditTask.setNavigationOnClickListener { finish() }
         binding.toolbarAddEditTask.title = if (taskId == -1L) "Add New Task" else "Edit Task"
-    }
-
-    private fun setupSubjectAutoComplete() {
-        lifecycleScope.launch {
-            val subjects = taskRepository.getSubjectsForUser(userId)
-            val adapter = ArrayAdapter(this@AddEditTaskActivity, android.R.layout.simple_dropdown_item_1line, subjects)
-            binding.actvSubject.setAdapter(adapter)
-        }
     }
 
     private fun setupDateTimePickers() {
@@ -96,6 +94,7 @@ class AddEditTaskActivity : AppCompatActivity() {
                     calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
                     calendar.set(Calendar.MINUTE, minute)
                     calendar.set(Calendar.SECOND, 0)
+                    calendar.set(Calendar.MILLISECOND, 0)
                     selectedDueDateMs = calendar.timeInMillis
                     updateDateTimeDisplay()
                 },
@@ -117,6 +116,10 @@ class AddEditTaskActivity : AppCompatActivity() {
         binding.btnSaveTask.setOnClickListener {
             saveTask()
         }
+
+        binding.btnCancel.setOnClickListener {
+            finish()
+        }
     }
 
     private fun loadExistingTaskDetails() {
@@ -124,7 +127,7 @@ class AddEditTaskActivity : AppCompatActivity() {
             val task = taskRepository.getTaskById(taskId) ?: return@launch
             binding.etTaskTitle.setText(task.title)
             binding.etTaskDesc.setText(task.description)
-            binding.actvSubject.setText(task.subject, false)
+            binding.etTaskSubject.setText(task.subject)
 
             selectedDueDateMs = task.dueDate
             calendar.timeInMillis = selectedDueDateMs
@@ -149,7 +152,7 @@ class AddEditTaskActivity : AppCompatActivity() {
     private fun saveTask() {
         val title = binding.etTaskTitle.text.toString().trim()
         val description = binding.etTaskDesc.text.toString().trim()
-        val subject = binding.actvSubject.text.toString().trim()
+        val subject = binding.etTaskSubject.text.toString().trim()
 
         binding.tilTaskTitle.error = null
         binding.tilTaskSubject.error = null
