@@ -1,2 +1,2 @@
 # Assignment-Task-Management-App
-Assignment and Task Management Application
+This system helps students organize their assignments, manage tasks, and track their deadlines.
