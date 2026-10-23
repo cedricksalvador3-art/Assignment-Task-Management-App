@@ -1,0 +1,45 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+  <!-- Background Card -->
+  <path
+      android:fillColor="#FFFFFF"
+      android:pathData="M20,15 h80 a10,10 0 0,1 10,10 v80 a10,10 0 0,1 -10,10 h-80 a10,10 0 0,1 -10,-10 v-80 a10,10 0 0,1 10,-10 z"/>
+  <!-- Top Header / Clip -->
+  <path
+      android:fillColor="#253B80"
+      android:pathData="M35,15 h50 a4,4 0 0,1 4,4 v8 h-58 v-8 a4,4 0 0,1 4,-4 z"/>
+  <!-- Checkbox / Badge -->
+  <path
+      android:fillColor="#22C55E"
+      android:pathData="M40,50 h16 v16 h-16 z"/>
+  <path
+      android:fillColor="#FFFFFF"
+      android:pathData="M43,58 l3,3 l7,-7"
+      android:strokeWidth="2.5"
+      android:strokeColor="#FFFFFF"/>
+  <!-- Text lines representing task items -->
+  <path
+      android:fillColor="#1E293B"
+      android:pathData="M64,48 h36 v6 h-36 z"/>
+  <path
+      android:fillColor="#94A3B8"
+      android:pathData="M64,58 h24 v4 h-24 z"/>
+
+  <path
+      android:fillColor="#2563EB"
+      android:pathData="M40,78 h16 v16 h-16 z"/>
+  <path
+      android:fillColor="#FFFFFF"
+      android:pathData="M43,86 l3,3 l7,-7"
+      android:strokeWidth="2.5"
+      android:strokeColor="#FFFFFF"/>
+  <path
+      android:fillColor="#1E293B"
+      android:pathData="M64,76 h36 v6 h-36 z"/>
+  <path
+      android:fillColor="#94A3B8"
+      android:pathData="M64,86 h24 v4 h-24 z"/>
+</vector>

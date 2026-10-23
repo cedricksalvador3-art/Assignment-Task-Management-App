@@ -24,14 +24,39 @@
             android:paddingEnd="20dp"
             android:paddingBottom="32dp">
 
-            <ImageView
-                android:id="@+id/iv_profile_avatar"
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                android:background="@drawable/bg_priority_medium"
-                android:padding="12dp"
-                android:src="@drawable/ic_profile"
-                app:tint="@color/navy_primary" />
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    app:cardBackgroundColor="@color/card_bg"
+                    app:cardCornerRadius="36dp"
+                    app:cardElevation="2dp">
+
+                    <ImageView
+                        android:id="@+id/iv_profile_avatar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="12dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_profile"
+                        app:tint="@color/navy_primary" />
+                </androidx.cardview.widget.CardView>
+
+                <!-- Edit Badge -->
+                <ImageView
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="bottom|end"
+                    android:background="@drawable/bg_button_primary"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_edit"
+                    app:tint="@color/white" />
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/tv_profile_name"

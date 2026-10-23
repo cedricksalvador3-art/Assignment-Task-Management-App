@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">DueWise</string>
+    <string name="tagline">Manage Tasks. Meet Deadlines.</string>
     <string name="welcome_back">Welcome back,</string>
     <string name="welcome_back_duewise">Welcome back to DueWise</string>
     <string name="create_your_duewise">Create your DueWise</string>
@@ -25,7 +26,7 @@
 
     <!-- Dashboard Strings -->
     <string name="dashboard_title">Dashboard</string>
-    <string name="good_morning">Good Morning, %1$s!</string>
+    <string name="good_morning">DueWise, %1$s!</string>
     <string name="total_tasks">Total Tasks</string>
     <string name="pending">Pending</string>
     <string name="completed">Completed</string>

@@ -17,16 +17,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Assignment_Task_Management_app">
 
-        <!-- Launcher Activity -->
+        <!-- Splash / Launcher Activity -->
         <activity
-            android:name=".ui.auth.LoginActivity"
+            android:name=".ui.auth.SplashActivity"
             android:exported="true"
-            android:windowSoftInputMode="adjustResize">
+            android:theme="@style/Theme.Assignment_Task_Management_app">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.auth.LoginActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".ui.auth.RegisterActivity"

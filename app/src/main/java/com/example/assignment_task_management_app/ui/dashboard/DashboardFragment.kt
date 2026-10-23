@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.assignment_task_management_app.R
 import com.example.assignment_task_management_app.adapter.TaskAdapter
 import com.example.assignment_task_management_app.databinding.FragmentDashboardBinding
 import com.example.assignment_task_management_app.db.DatabaseHelper
@@ -63,7 +64,7 @@ class DashboardFragment : Fragment() {
 
     private fun setupUI() {
         val name = sessionManager.getLoggedInFullName() ?: "User"
-        binding.tvGreeting.text = "Good Morning, $name!"
+        binding.tvGreeting.text = getString(R.string.good_morning, name)
 
         val dateFormat = SimpleDateFormat("EEEE, MMM dd", Locale.US).apply {
             timeZone = DateUtils.PHILIPPINE_TIME_ZONE

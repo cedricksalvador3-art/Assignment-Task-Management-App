@@ -14,7 +14,14 @@ class SessionManager(context: Context) {
         private const val KEY_USERNAME = "username"
         private const val KEY_FULL_NAME = "fullName"
         private const val KEY_EMAIL = "email"
+        private const val KEY_PROFILE_PIC_PATH = "profilePicPath"
     }
+
+    fun saveProfilePicPath(path: String) {
+        prefs.edit().putString(KEY_PROFILE_PIC_PATH, path).apply()
+    }
+
+    fun getProfilePicPath(): String? = prefs.getString(KEY_PROFILE_PIC_PATH, null)
 
     fun saveUserSession(userId: Long, username: String, fullName: String, email: String) {
         prefs.edit().apply {
