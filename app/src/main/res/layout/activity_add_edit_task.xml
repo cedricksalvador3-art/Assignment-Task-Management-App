@@ -182,6 +182,19 @@
                         android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
 
+                    <TextView
+                        android:id="@+id/tv_date_warning"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_priority_high"
+                        android:padding="8dp"
+                        android:text="Selected due date is in the past! Please choose a valid future date."
+                        android:textColor="@color/error_red"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
                     <!-- Priority Segmented Buttons -->
                     <TextView
                         android:layout_width="wrap_content"
@@ -239,67 +252,6 @@
                             android:text="@string/high"
                             android:textColor="@color/segmented_text_selector"
                             android:textSize="13sp"
-                            android:textStyle="bold" />
-                    </RadioGroup>
-
-                    <!-- Status Options (for edit) -->
-                    <TextView
-                        android:id="@+id/lbl_status_section"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="@string/status"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                    <RadioGroup
-                        android:id="@+id/rg_status"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:layout_marginTop="8dp"
-                        android:background="@drawable/bg_input_field"
-                        android:orientation="horizontal"
-                        android:padding="3dp">
-
-                        <RadioButton
-                            android:id="@+id/rb_status_pending"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:background="@drawable/segmented_button_selector"
-                            android:button="@null"
-                            android:checked="true"
-                            android:gravity="center"
-                            android:text="Pending"
-                            android:textColor="@color/segmented_text_selector"
-                            android:textSize="12sp"
-                            android:textStyle="bold" />
-
-                        <RadioButton
-                            android:id="@+id/rb_status_in_progress"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:background="@drawable/segmented_button_selector"
-                            android:button="@null"
-                            android:gravity="center"
-                            android:text="In Progress"
-                            android:textColor="@color/segmented_text_selector"
-                            android:textSize="12sp"
-                            android:textStyle="bold" />
-
-                        <RadioButton
-                            android:id="@+id/rb_status_completed"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:background="@drawable/segmented_button_selector"
-                            android:button="@null"
-                            android:gravity="center"
-                            android:text="Completed"
-                            android:textColor="@color/segmented_text_selector"
-                            android:textSize="12sp"
                             android:textStyle="bold" />
                     </RadioGroup>
 

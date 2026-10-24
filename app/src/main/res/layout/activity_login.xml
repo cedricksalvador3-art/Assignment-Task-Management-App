@@ -106,14 +106,16 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_login"
                     android:layout_width="match_parent"
-                    android:layout_height="54dp"
+                    android:layout_height="56dp"
                     android:layout_marginTop="24dp"
-                    android:backgroundTint="@color/navy_primary"
+                    android:backgroundTint="@color/accent"
+                    android:elevation="4dp"
                     android:text="@string/login"
                     android:textColor="@color/white"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    app:cornerRadius="12dp" />
+                    app:cornerRadius="14dp"
+                    app:rippleColor="@color/white" />
 
                 <!-- Forgot Password -->
                 <TextView
@@ -137,10 +139,11 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="12dp"
                     android:background="?attr/selectableItemBackground"
-                    android:padding="4dp"
+                    android:padding="6dp"
                     android:text="@string/dont_have_account"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp" />
+                    android:textColor="@color/accent"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>

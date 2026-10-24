@@ -45,6 +45,8 @@ object NotificationHelper {
         val intent = Intent(context, TaskDetailActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             putExtra("EXTRA_TASK_ID", taskId)
+            putExtra("EXTRA_READ_ONLY", true)
+            putExtra("EXTRA_FROM_NOTIFICATION", true)
         }
 
         val pendingIntentFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

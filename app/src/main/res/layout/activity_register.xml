@@ -49,13 +49,13 @@
                 android:orientation="vertical"
                 android:padding="20dp">
 
-                <!-- Full Name -->
+                <!-- First Name -->
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/til_full_name"
+                    android:id="@+id/til_first_name"
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/full_name"
+                    android:hint="@string/first_name"
                     app:boxCornerRadiusBottomEnd="12dp"
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
@@ -63,7 +63,51 @@
                     app:startIconDrawable="@drawable/ic_profile">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/et_full_name"
+                        android:id="@+id/et_first_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName"
+                        android:textColor="@color/text_primary" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Middle Name (Optional) -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_middle_name"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:hint="@string/middle_name_optional"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:startIconDrawable="@drawable/ic_profile">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_middle_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName"
+                        android:textColor="@color/text_primary" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Last Name -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_last_name"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:hint="@string/last_name"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:startIconDrawable="@drawable/ic_profile">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_last_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textPersonName"
@@ -179,14 +223,16 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_register"
                     android:layout_width="match_parent"
-                    android:layout_height="54dp"
+                    android:layout_height="56dp"
                     android:layout_marginTop="20dp"
-                    android:backgroundTint="@color/navy_primary"
+                    android:backgroundTint="@color/accent"
+                    android:elevation="4dp"
                     android:text="@string/sign_up"
                     android:textColor="@color/white"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    app:cornerRadius="12dp" />
+                    app:cornerRadius="14dp"
+                    app:rippleColor="@color/white" />
 
                 <!-- Login Link -->
                 <TextView
@@ -196,10 +242,11 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="16dp"
                     android:background="?attr/selectableItemBackground"
-                    android:padding="4dp"
+                    android:padding="6dp"
                     android:text="@string/already_have_account"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp" />
+                    android:textColor="@color/accent"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>

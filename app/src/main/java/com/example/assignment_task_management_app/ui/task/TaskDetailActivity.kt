@@ -3,6 +3,7 @@ package com.example.assignment_task_management_app.ui.task
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -27,6 +28,7 @@ class TaskDetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTaskDetailBinding
     private lateinit var taskRepository: TaskRepository
     private var taskId: Long = -1L
+    private var isReadOnly: Boolean = false
     private var currentTask: Task? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +40,7 @@ class TaskDetailActivity : AppCompatActivity() {
         taskRepository = TaskRepository(dbHelper)
 
         taskId = intent.getLongExtra("EXTRA_TASK_ID", -1L)
+        isReadOnly = intent.getBooleanExtra("EXTRA_READ_ONLY", false) || intent.getBooleanExtra("EXTRA_FROM_NOTIFICATION", false)
 
         setupToolbar()
         setupBottomNav()
@@ -76,12 +79,6 @@ class TaskDetailActivity : AppCompatActivity() {
 
         binding.btnDetailUpdateStatus.setOnClickListener {
             showUpdateStatusDialog()
-        }
-
-        binding.btnDetailMarkCompleted.setOnClickListener {
-            val task = currentTask ?: return@setOnClickListener
-            val newStatus = if (task.status == TaskStatus.COMPLETED) TaskStatus.PENDING else TaskStatus.COMPLETED
-            updateStatus(newStatus)
         }
 
         binding.btnDetailDelete.setOnClickListener {
@@ -159,6 +156,8 @@ class TaskDetailActivity : AppCompatActivity() {
             }
             currentTask = task
 
+            binding.layoutActionButtons.visibility = if (isReadOnly) View.GONE else View.VISIBLE
+
             binding.tvDetailTitle.text = task.title
             binding.tvDetailSubject.text = task.subject
 
@@ -210,13 +209,6 @@ class TaskDetailActivity : AppCompatActivity() {
                         binding.tvDetailStatus.setTextColor(ContextCompat.getColor(this@TaskDetailActivity, R.color.status_completed_text))
                     }
                 }
-            }
-
-            // Button label styling
-            if (task.status == TaskStatus.COMPLETED) {
-                binding.btnDetailMarkCompleted.text = "Re-open Task (Set Pending)"
-            } else {
-                binding.btnDetailMarkCompleted.text = getString(R.string.mark_as_completed)
             }
         }
     }

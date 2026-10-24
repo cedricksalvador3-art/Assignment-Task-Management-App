@@ -39,21 +39,30 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun attemptRegister() {
-        val fullName = binding.etFullName.text.toString().trim()
+        val firstName = binding.etFirstName.text.toString().trim()
+        val middleName = binding.etMiddleName.text.toString().trim()
+        val lastName = binding.etLastName.text.toString().trim()
         val username = binding.etRegUsername.text.toString().trim()
         val email = binding.etEmail.text.toString().trim()
         val password = binding.etRegPassword.text.toString().trim()
         val confirmPassword = binding.etConfirmPassword.text.toString().trim()
 
-        binding.tilFullName.error = null
+        binding.tilFirstName.error = null
+        binding.tilMiddleName.error = null
+        binding.tilLastName.error = null
         binding.tilRegUsername.error = null
         binding.tilEmail.error = null
         binding.tilRegPassword.error = null
         binding.tilConfirmPassword.error = null
         binding.tvMismatchWarning.visibility = View.GONE
 
-        if (fullName.isEmpty()) {
-            binding.tilFullName.error = "Full Name is required"
+        if (firstName.isEmpty()) {
+            binding.tilFirstName.error = "First Name is required"
+            return
+        }
+
+        if (lastName.isEmpty()) {
+            binding.tilLastName.error = "Last Name is required"
             return
         }
 
@@ -76,6 +85,12 @@ class RegisterActivity : AppCompatActivity() {
             binding.tvMismatchWarning.visibility = View.VISIBLE
             binding.tilConfirmPassword.error = "Passwords do not match"
             return
+        }
+
+        val fullName = if (middleName.isNotEmpty()) {
+            "$firstName $middleName $lastName"
+        } else {
+            "$firstName $lastName"
         }
 
         lifecycleScope.launch {

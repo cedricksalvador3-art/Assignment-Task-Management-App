@@ -32,17 +32,19 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
+                    <!-- Centered Greeting & Date Label -->
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true"
+                        android:layout_centerInParent="true"
+                        android:gravity="center"
                         android:orientation="vertical">
 
                         <TextView
                             android:id="@+id/tv_greeting"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:gravity="center"
                             android:text="@string/good_morning"
                             android:textColor="@color/white"
                             android:textSize="22sp"
@@ -53,6 +55,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
+                            android:gravity="center"
                             android:text="Monday, Oct 26"
                             android:textColor="#94A3B8"
                             android:textSize="13sp" />

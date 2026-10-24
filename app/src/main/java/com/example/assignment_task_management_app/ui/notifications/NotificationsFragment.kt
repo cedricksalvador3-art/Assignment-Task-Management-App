@@ -61,6 +61,8 @@ class NotificationsFragment : Fragment() {
             onItemClick = { item ->
                 val intent = Intent(requireContext(), TaskDetailActivity::class.java).apply {
                     putExtra("EXTRA_TASK_ID", item.taskId)
+                    putExtra("EXTRA_READ_ONLY", true)
+                    putExtra("EXTRA_FROM_NOTIFICATION", true)
                 }
                 startActivity(intent)
             }

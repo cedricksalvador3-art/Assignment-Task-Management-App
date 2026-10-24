@@ -198,63 +198,57 @@
 
                 <!-- Action Buttons Stack -->
                 <LinearLayout
+                    android:id="@+id/layout_action_buttons"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
-                    android:orientation="horizontal">
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_detail_edit"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_marginEnd="6dp"
+                            android:layout_weight="1"
+                            android:backgroundTint="@color/navy_primary"
+                            android:text="@string/edit_task"
+                            android:textColor="@color/white"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            app:cornerRadius="10dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_detail_update_status"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_marginStart="6dp"
+                            android:layout_weight="1"
+                            android:backgroundTint="@color/navy_primary"
+                            android:text="@string/update_status"
+                            android:textColor="@color/white"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            app:cornerRadius="10dp" />
+                    </LinearLayout>
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_detail_edit"
-                        android:layout_width="0dp"
+                        android:id="@+id/btn_detail_delete"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="match_parent"
                         android:layout_height="48dp"
-                        android:layout_marginEnd="6dp"
-                        android:layout_weight="1"
-                        android:backgroundTint="@color/navy_primary"
-                        android:text="@string/edit_task"
-                        android:textColor="@color/white"
-                        android:textSize="13sp"
+                        android:layout_marginTop="12dp"
+                        android:text="@string/delete_task"
+                        android:textColor="@color/error_red"
+                        android:textSize="14sp"
                         android:textStyle="bold"
-                        app:cornerRadius="10dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_detail_update_status"
-                        android:layout_width="0dp"
-                        android:layout_height="48dp"
-                        android:layout_marginStart="6dp"
-                        android:layout_weight="1"
-                        android:backgroundTint="@color/navy_primary"
-                        android:text="@string/update_status"
-                        android:textColor="@color/white"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        app:cornerRadius="10dp" />
+                        app:cornerRadius="10dp"
+                        app:strokeColor="@color/error_red" />
                 </LinearLayout>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_detail_mark_completed"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="12dp"
-                    android:text="@string/mark_as_completed"
-                    android:textColor="@color/navy_primary"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="10dp"
-                    app:strokeColor="@color/navy_primary" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_detail_delete"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="12dp"
-                    android:text="@string/delete_task"
-                    android:textColor="@color/error_red"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="10dp"
-                    app:strokeColor="@color/error_red" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>

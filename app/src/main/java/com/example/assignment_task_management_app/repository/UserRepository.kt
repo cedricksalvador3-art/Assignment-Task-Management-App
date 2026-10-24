@@ -110,4 +110,55 @@ class UserRepository(private val userDao: UserDao) {
     }
 
     suspend fun getUserById(userId: Long): User? = userDao.getUserById(userId)
+
+    suspend fun updateUserProfile(userId: Long, fullName: String, email: String): Result<Boolean> {
+        return try {
+            val user = userDao.getUserById(userId)
+                ?: return Result.failure(Exception("User not found."))
+
+            if (email != user.email) {
+                val existingEmailUser = userDao.getUserByEmail(email)
+                if (existingEmailUser != null && existingEmailUser.id != userId) {
+                    return Result.failure(Exception("Email '$email' is already in use."))
+                }
+            }
+
+            val updated = user.copy(fullName = fullName, email = email)
+            val success = userDao.updateUser(updated)
+            if (success) Result.success(true) else Result.failure(Exception("Failed to update profile."))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun changePassword(userId: Long, currentPass: String, newPass: String): Result<Boolean> {
+        return try {
+            val user = userDao.getUserById(userId)
+                ?: return Result.failure(Exception("User not found."))
+
+            if (user.passwordHash != currentPass) {
+                return Result.failure(Exception("Current password is incorrect."))
+            }
+
+            val updated = user.copy(passwordHash = newPass)
+            val success = userDao.updateUser(updated)
+            if (success) Result.success(true) else Result.failure(Exception("Failed to update password."))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun resetPasswordByEmailOrUsername(identifier: String, newPass: String): Result<Boolean> {
+        return try {
+            val user = userDao.getUserByUsername(identifier)
+                ?: userDao.getUserByEmail(identifier)
+                ?: return Result.failure(Exception("No registered account found with that email or username."))
+
+            val updated = user.copy(passwordHash = newPass, failedAttempts = 0, isLocked = false, lockedUntil = 0L)
+            val success = userDao.updateUser(updated)
+            if (success) Result.success(true) else Result.failure(Exception("Failed to reset password."))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

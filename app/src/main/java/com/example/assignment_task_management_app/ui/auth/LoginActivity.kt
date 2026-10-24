@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.assignment_task_management_app.R
 import com.example.assignment_task_management_app.databinding.ActivityLoginBinding
+import com.example.assignment_task_management_app.databinding.DialogForgotPasswordBinding
 import com.example.assignment_task_management_app.db.DatabaseHelper
 import com.example.assignment_task_management_app.repository.LoginResult
 import com.example.assignment_task_management_app.repository.UserRepository
@@ -49,7 +50,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
         binding.tvForgotPassword.setOnClickListener {
-            Toast.makeText(this, "Password reset link sent to your registered email.", Toast.LENGTH_LONG).show()
+            showForgotPasswordDialog()
         }
 
         binding.tvRegisterLink.setOnClickListener {
@@ -107,6 +108,61 @@ class LoginActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun showForgotPasswordDialog() {
+        val dialogBinding = DialogForgotPasswordBinding.inflate(layoutInflater)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogBinding.root)
+            .create()
+
+        val currentInput = binding.etUsername.text.toString().trim()
+        if (currentInput.isNotEmpty()) {
+            dialogBinding.etResetIdentifier.setText(currentInput)
+        }
+
+        dialogBinding.btnCancelReset.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialogBinding.btnSubmitReset.setOnClickListener {
+            val identifier = dialogBinding.etResetIdentifier.text.toString().trim()
+            val newPass = dialogBinding.etResetNewPassword.text.toString().trim()
+            val confirmPass = dialogBinding.etResetConfirmPassword.text.toString().trim()
+
+            dialogBinding.tilResetIdentifier.error = null
+            dialogBinding.tilResetNewPassword.error = null
+            dialogBinding.tilResetConfirmPassword.error = null
+
+            if (identifier.isEmpty()) {
+                dialogBinding.tilResetIdentifier.error = "Registered email address or username is required"
+                return@setOnClickListener
+            }
+
+            if (newPass.isEmpty()) {
+                dialogBinding.tilResetNewPassword.error = "New password is required"
+                return@setOnClickListener
+            }
+
+            if (newPass != confirmPass) {
+                dialogBinding.tilResetConfirmPassword.error = "Passwords do not match"
+                return@setOnClickListener
+            }
+
+            lifecycleScope.launch {
+                val result = userRepository.resetPasswordByEmailOrUsername(identifier, newPass)
+                result.onSuccess {
+                    dialog.dismiss()
+                    binding.etUsername.setText(identifier)
+                    binding.etPassword.text?.clear()
+                    Toast.makeText(this@LoginActivity, "Password reset successfully! You can now log in.", Toast.LENGTH_LONG).show()
+                }.onFailure { ex ->
+                    dialogBinding.tilResetIdentifier.error = ex.message ?: "Account not found"
+                }
+            }
+        }
+
+        dialog.show()
     }
 
     private fun showAccountLockedDialog() {

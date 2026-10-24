@@ -3,9 +3,13 @@ package com.example.assignment_task_management_app.ui.task
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import com.example.assignment_task_management_app.R
 import com.example.assignment_task_management_app.databinding.ActivityAddEditTaskBinding
 import com.example.assignment_task_management_app.db.DatabaseHelper
 import com.example.assignment_task_management_app.model.Task
@@ -29,6 +33,7 @@ class AddEditTaskActivity : AppCompatActivity() {
 
     private val calendar: Calendar = DateUtils.getPhilippineCalendar()
     private var selectedDueDateMs: Long = 0L
+    private var existingTaskStatus: TaskStatus = TaskStatus.PENDING
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,6 +89,8 @@ class AddEditTaskActivity : AppCompatActivity() {
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH)
             )
+            val minDateVal = minOf(calendar.timeInMillis, System.currentTimeMillis() - 1000L)
+            datePicker.datePicker.minDate = minDateVal
             datePicker.show()
         }
 
@@ -110,6 +117,14 @@ class AddEditTaskActivity : AppCompatActivity() {
         binding.tvSelectedDateTime.text = "Due: " + DateUtils.formatDateTime(selectedDueDateMs)
         binding.btnPickDate.text = DateUtils.formatDate(selectedDueDateMs)
         binding.btnPickTime.text = DateUtils.formatTime(selectedDueDateMs)
+
+        if (selectedDueDateMs < System.currentTimeMillis()) {
+            binding.tvDateWarning.visibility = View.VISIBLE
+            binding.tvSelectedDateTime.setTextColor(ContextCompat.getColor(this, R.color.error_red))
+        } else {
+            binding.tvDateWarning.visibility = View.GONE
+            binding.tvSelectedDateTime.setTextColor(ContextCompat.getColor(this, R.color.text_secondary))
+        }
     }
 
     private fun setupListeners() {
@@ -132,17 +147,12 @@ class AddEditTaskActivity : AppCompatActivity() {
             selectedDueDateMs = task.dueDate
             calendar.timeInMillis = selectedDueDateMs
             updateDateTimeDisplay()
+            existingTaskStatus = task.status
 
             when (task.priority) {
                 TaskPriority.HIGH -> binding.rbPriorityHigh.isChecked = true
                 TaskPriority.MEDIUM -> binding.rbPriorityMedium.isChecked = true
                 TaskPriority.LOW -> binding.rbPriorityLow.isChecked = true
-            }
-
-            when (task.status) {
-                TaskStatus.PENDING -> binding.rbStatusPending.isChecked = true
-                TaskStatus.IN_PROGRESS -> binding.rbStatusInProgress.isChecked = true
-                TaskStatus.COMPLETED -> binding.rbStatusCompleted.isChecked = true
             }
 
             binding.switchReminder.isChecked = task.isReminderSet
@@ -167,17 +177,28 @@ class AddEditTaskActivity : AppCompatActivity() {
             return
         }
 
+        if (selectedDueDateMs < System.currentTimeMillis()) {
+            binding.tvDateWarning.visibility = View.VISIBLE
+            binding.tvSelectedDateTime.setTextColor(ContextCompat.getColor(this, R.color.error_red))
+            AlertDialog.Builder(this)
+                .setTitle("Invalid Due Date")
+                .setMessage("The selected due date has already passed. Please choose a valid future date to save this task.")
+                .setPositiveButton("Choose Date") { dialog, _ ->
+                    dialog.dismiss()
+                    binding.btnPickDate.performClick()
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+            return
+        }
+
         val priority = when {
             binding.rbPriorityHigh.isChecked -> TaskPriority.HIGH
             binding.rbPriorityLow.isChecked -> TaskPriority.LOW
             else -> TaskPriority.MEDIUM
         }
 
-        val status = when {
-            binding.rbStatusCompleted.isChecked -> TaskStatus.COMPLETED
-            binding.rbStatusInProgress.isChecked -> TaskStatus.IN_PROGRESS
-            else -> TaskStatus.PENDING
-        }
+        val status = existingTaskStatus
 
         val isReminderSet = binding.switchReminder.isChecked
 

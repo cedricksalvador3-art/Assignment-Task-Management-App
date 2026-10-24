@@ -32,6 +32,9 @@ class TaskRepository(private val taskDao: TaskDao) {
             if (task.subject.isBlank()) {
                 return Result.failure(Exception("Subject is required."))
             }
+            if (task.dueDate < System.currentTimeMillis()) {
+                return Result.failure(Exception("Selected due date is in the past. Please choose a valid future date."))
+            }
             val id = taskDao.insertTask(task)
             if (id > 0) {
                 Result.success(id)
@@ -50,6 +53,9 @@ class TaskRepository(private val taskDao: TaskDao) {
             }
             if (task.subject.isBlank()) {
                 return Result.failure(Exception("Subject is required."))
+            }
+            if (task.dueDate < System.currentTimeMillis()) {
+                return Result.failure(Exception("Selected due date is in the past. Please choose a valid future date."))
             }
             val success = taskDao.updateTask(task)
             if (success) {
@@ -92,7 +98,10 @@ class TaskRepository(private val taskDao: TaskDao) {
 
     suspend fun getDashboardStats(userId: Long): DashboardStats {
         val allTasks = taskDao.getTasksForUser(userId)
-        val total = allTasks.size
+        val activeTasks = allTasks.filter { it.status != TaskStatus.COMPLETED }
+        val totalActive = activeTasks.size
+        val totalAll = allTasks.size
+
         val completed = allTasks.count { it.status == TaskStatus.COMPLETED }
         val overdue = allTasks.count { it.status != TaskStatus.COMPLETED && DateUtils.isOverdue(it.dueDate) }
         val pending = allTasks.count { it.status == TaskStatus.PENDING && !DateUtils.isOverdue(it.dueDate) }
@@ -102,10 +111,10 @@ class TaskRepository(private val taskDao: TaskDao) {
         val mediumCount = allTasks.count { it.priority == TaskPriority.MEDIUM }
         val lowCount = allTasks.count { it.priority == TaskPriority.LOW }
 
-        val percentage = if (total > 0) ((completed.toDouble() / total.toDouble()) * 100).toInt() else 0
+        val percentage = if (totalAll > 0) ((completed.toDouble() / totalAll.toDouble()) * 100).toInt() else 0
 
         return DashboardStats(
-            totalTasks = total,
+            totalTasks = totalActive,
             pendingTasks = pending + inProgress,
             inProgressTasks = inProgress,
             completedTasks = completed,
