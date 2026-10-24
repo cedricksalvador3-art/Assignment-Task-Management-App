@@ -63,8 +63,7 @@ class DashboardFragment : Fragment() {
     }
 
     private fun setupUI() {
-        val name = sessionManager.getLoggedInFullName() ?: "User"
-        binding.tvGreeting.text = getString(R.string.good_morning, name)
+        binding.tvGreeting.text = getString(R.string.app_name)
 
         val dateFormat = SimpleDateFormat("EEEE, MMM dd", Locale.US).apply {
             timeZone = DateUtils.PHILIPPINE_TIME_ZONE
