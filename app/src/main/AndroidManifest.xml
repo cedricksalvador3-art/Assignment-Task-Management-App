@@ -2,10 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.VIBRATE" />
+
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -51,10 +54,34 @@
             android:name=".ui.task.TaskDetailActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".ui.scanner.ScannerActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.scanner.ScanResultActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.scanner.MathSolutionActivity"
+            android:exported="false" />
+
         <!-- BroadcastReceiver for Scheduled Reminders -->
         <receiver
             android:name=".utils.ReminderReceiver"
             android:exported="false" />
+
+        <!-- FileProvider for opening generated PDF soft copies -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0F172A">
+
+    <!-- Top Header Navigation -->
+    <RelativeLayout
+        android:id="@+id/layout_scanner_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentTop="true"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <ImageView
+            android:id="@+id/btn_scanner_close"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Close"
+            android:padding="6dp"
+            android:src="@drawable/ic_chevron_right"
+            android:rotation="180"
+            app:tint="@color/white" />
+
+        <!-- Segmented Mode Toggle: Document | Math -->
+        <RadioGroup
+            android:id="@+id/rg_scanner_mode"
+            android:layout_width="200dp"
+            android:layout_height="36dp"
+            android:layout_centerInParent="true"
+            android:background="#1E293B"
+            android:orientation="horizontal"
+            android:padding="2dp">
+
+            <RadioButton
+                android:id="@+id/rb_mode_document"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/segmented_button_selector"
+                android:button="@null"
+                android:checked="true"
+                android:gravity="center"
+                android:text="📄 Document"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <RadioButton
+                android:id="@+id/rb_mode_math"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/segmented_button_selector"
+                android:button="@null"
+                android:gravity="center"
+                android:text="➗ Math"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </RadioGroup>
+
+        <ImageView
+            android:id="@+id/btn_scanner_flash"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Flash"
+            android:padding="6dp"
+            android:src="@drawable/ic_flash"
+            app:tint="@color/white" />
+    </RelativeLayout>
+
+    <!-- Camera Frame Overlay -->
+    <FrameLayout
+        android:id="@+id/layout_camera_frame"
+        android:layout_width="320dp"
+        android:layout_height="400dp"
+        android:layout_centerInParent="true"
+        android:background="@drawable/bg_button_outline"
+        android:padding="8dp">
+
+        <!-- Live CameraX Preview -->
+        <androidx.camera.view.PreviewView
+            android:id="@+id/view_finder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:id="@+id/iv_camera_preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="Camera Preview"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_task_illustration"
+            android:visibility="gone" />
+
+        <!-- Live Math Overlay Guide for Math Mode -->
+        <TextView
+            android:id="@+id/tv_math_live_overlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="#B30F172A"
+            android:paddingStart="20dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="10dp"
+            android:text="Aim camera at math problem"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <!-- Scanning Guidance Text -->
+    <TextView
+        android:id="@+id/tv_scanner_guide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/layout_camera_frame"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:text="Place the paper inside the frame\nSaves as PDF, DOCX &amp; more"
+        android:textColor="#94A3B8"
+        android:textSize="13sp" />
+
+    <!-- Bottom Controls: Gallery | Shutter | Camera Flip -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_alignParentBottom="true"
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp">
+
+        <!-- Gallery Icon -->
+        <ImageView
+            android:id="@+id/btn_scanner_gallery"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/bg_card_rounded"
+            android:contentDescription="Gallery"
+            android:padding="12dp"
+            android:src="@drawable/ic_profile"
+            app:tint="@color/text_primary" />
+
+        <!-- Circular Shutter Button -->
+        <FrameLayout
+            android:id="@+id/btn_scanner_shutter"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_centerInParent="true"
+            android:background="@drawable/bg_circular_progress">
+
+            <View
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_navy_header" />
+        </FrameLayout>
+
+        <!-- Flip Camera Icon -->
+        <ImageView
+            android:id="@+id/btn_scanner_flip"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/bg_card_rounded"
+            android:contentDescription="Flip Camera"
+            android:padding="12dp"
+            android:src="@drawable/ic_camera_flip"
+            app:tint="@color/text_primary" />
+    </RelativeLayout>
+
+</RelativeLayout>

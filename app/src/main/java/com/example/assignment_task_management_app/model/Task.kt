@@ -10,5 +10,7 @@ data class Task(
     val priority: TaskPriority = TaskPriority.MEDIUM,
     val status: TaskStatus = TaskStatus.PENDING,
     val isReminderSet: Boolean = true,
+    val pdfPath: String? = null,
+    val mathSolution: String? = null,
     val createdAt: Long = System.currentTimeMillis()
 )

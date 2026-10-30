@@ -196,6 +196,97 @@
                     </LinearLayout>
                 </LinearLayout>
 
+                <!-- Scanned PDF Soft Copy Section -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/card_detail_pdf"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="@color/navy_primary_light"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="0dp">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="14dp">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="📄 Scanned Soft Copy PDF"
+                                android:textColor="@color/navy_primary"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="Saved in your assignment task list"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_open_pdf"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:backgroundTint="@color/navy_primary"
+                            android:text="Open PDF"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            app:cornerRadius="8dp" />
+                    </RelativeLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Math Solutions Section -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/card_detail_math"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="@color/card_bg"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="1dp"
+                    app:strokeColor="@color/divider"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="📐 Automated Math Solutions &amp; Analysis"
+                            android:textColor="@color/navy_primary"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_detail_math_solutions"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
                 <!-- Action Buttons Stack -->
                 <LinearLayout
                     android:id="@+id/layout_action_buttons"

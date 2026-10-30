@@ -16,7 +16,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     companion object {
         private const val DATABASE_NAME = "assignment_task_app.db"
-        private const val DATABASE_VERSION = 2
+        private const val DATABASE_VERSION = 3
 
         // Table Users
         private const val TABLE_USERS = "users"
@@ -40,6 +40,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         private const val KEY_PRIORITY = "priority"
         private const val KEY_STATUS = "status"
         private const val KEY_IS_REMINDER = "isReminderSet"
+        private const val KEY_PDF_PATH = "pdfPath"
+        private const val KEY_MATH_SOLUTION = "mathSolution"
         private const val KEY_CREATED_AT = "createdAt"
 
         @Volatile
@@ -77,6 +79,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 $KEY_PRIORITY TEXT NOT NULL,
                 $KEY_STATUS TEXT NOT NULL,
                 $KEY_IS_REMINDER INTEGER DEFAULT 1,
+                $KEY_PDF_PATH TEXT,
+                $KEY_MATH_SOLUTION TEXT,
                 $KEY_CREATED_AT INTEGER NOT NULL,
                 FOREIGN KEY($KEY_TASK_USER_ID) REFERENCES $TABLE_USERS($KEY_USER_ID) ON DELETE CASCADE
             )
@@ -89,7 +93,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     }
 
     private fun seedDefaultData(db: SQLiteDatabase) {
-        // Create default user Jane Doe
         val userValues = ContentValues().apply {
             put(KEY_USERNAME, "janedoe")
             put(KEY_FULL_NAME, "Jane Doe")
@@ -122,7 +125,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             sampleTasks.add(
                 Task(
                     userId = userId,
-                    title = "Potoir Lab Report",
+                    title = "Physics Lab Report 2",
                     description = "Prepare data sheets and error calculation graph.",
                     subject = "Science",
                     dueDate = now - (2 * dayMs),
@@ -136,7 +139,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 Task(
                     userId = userId,
                     title = "History Essay",
-                    description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.",
+                    description = "Write a comprehensive essay on historical events and milestones.",
                     subject = "History",
                     dueDate = now + (1 * dayMs),
                     priority = TaskPriority.HIGH,
@@ -187,94 +190,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     status = TaskStatus.PENDING
                 )
             )
-            sampleTasks.add(
-                Task(
-                    userId = userId,
-                    title = "Algebra Practice Set",
-                    description = "Quadratic equations homework assignment.",
-                    subject = "Mathematics",
-                    dueDate = now + (6 * dayMs),
-                    priority = TaskPriority.MEDIUM,
-                    status = TaskStatus.PENDING
-                )
-            )
-            sampleTasks.add(
-                Task(
-                    userId = userId,
-                    title = "World War II Summary",
-                    description = "Summarize causes and major turning points of WWII.",
-                    subject = "History",
-                    dueDate = now + (7 * dayMs),
-                    priority = TaskPriority.LOW,
-                    status = TaskStatus.PENDING
-                )
-            )
-            sampleTasks.add(
-                Task(
-                    userId = userId,
-                    title = "Data Structures Quiz",
-                    description = "Review binary search trees and heap sort algorithm.",
-                    subject = "Programming",
-                    dueDate = now + (8 * dayMs),
-                    priority = TaskPriority.HIGH,
-                    status = TaskStatus.PENDING
-                )
-            )
-            sampleTasks.add(
-                Task(
-                    userId = userId,
-                    title = "Grammar Exercise 3",
-                    description = "Complete clause identification exercises.",
-                    subject = "English",
-                    dueDate = now + (9 * dayMs),
-                    priority = TaskPriority.LOW,
-                    status = TaskStatus.PENDING
-                )
-            )
-            sampleTasks.add(
-                Task(
-                    userId = userId,
-                    title = "Biology Cell Structure",
-                    description = "Draw diagram of plant and animal cell organelles.",
-                    subject = "Science",
-                    dueDate = now + (10 * dayMs),
-                    priority = TaskPriority.MEDIUM,
-                    status = TaskStatus.PENDING
-                )
-            )
-            sampleTasks.add(
-                Task(
-                    userId = userId,
-                    title = "Geometry Proofs",
-                    description = "Triangle congruence proofs assignment.",
-                    subject = "Mathematics",
-                    dueDate = now + (11 * dayMs),
-                    priority = TaskPriority.MEDIUM,
-                    status = TaskStatus.PENDING
-                )
-            )
-            sampleTasks.add(
-                Task(
-                    userId = userId,
-                    title = "Android UI Layout",
-                    description = "Design Jetpack Compose/XML views for dashboard.",
-                    subject = "Programming",
-                    dueDate = now + (12 * dayMs),
-                    priority = TaskPriority.HIGH,
-                    status = TaskStatus.IN_PROGRESS
-                )
-            )
-            sampleTasks.add(
-                Task(
-                    userId = userId,
-                    title = "Ancient Greece Presentation",
-                    description = "Prepare slides on Athenian democracy.",
-                    subject = "History",
-                    dueDate = now + (13 * dayMs),
-                    priority = TaskPriority.MEDIUM,
-                    status = TaskStatus.PENDING
-                )
-            )
 
             // Completed Tasks (11)
             for (i in 1..11) {
@@ -301,6 +216,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     put(KEY_PRIORITY, task.priority.name)
                     put(KEY_STATUS, task.status.name)
                     put(KEY_IS_REMINDER, 1)
+                    put(KEY_PDF_PATH, task.pdfPath)
+                    put(KEY_MATH_SOLUTION, task.mathSolution)
                     put(KEY_CREATED_AT, now)
                 }
                 db.insert(TABLE_TASKS, null, values)
@@ -312,8 +229,16 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         if (oldVersion < 2) {
             try {
                 db.execSQL("ALTER TABLE $TABLE_USERS ADD COLUMN $KEY_LOCKED_UNTIL INTEGER DEFAULT 0")
-            } catch (e: Exception) {
-                // Column might already exist
+            } catch (_: Exception) {
+                // Column might exist
+            }
+        }
+        if (oldVersion < 3) {
+            try {
+                db.execSQL("ALTER TABLE $TABLE_TASKS ADD COLUMN $KEY_PDF_PATH TEXT")
+                db.execSQL("ALTER TABLE $TABLE_TASKS ADD COLUMN $KEY_MATH_SOLUTION TEXT")
+            } catch (_: Exception) {
+                // Columns might exist
             }
         }
     }
@@ -443,6 +368,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             put(KEY_PRIORITY, task.priority.name)
             put(KEY_STATUS, task.status.name)
             put(KEY_IS_REMINDER, if (task.isReminderSet) 1 else 0)
+            put(KEY_PDF_PATH, task.pdfPath)
+            put(KEY_MATH_SOLUTION, task.mathSolution)
             put(KEY_CREATED_AT, task.createdAt)
         }
         db.insert(TABLE_TASKS, null, values)
@@ -458,6 +385,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             put(KEY_PRIORITY, task.priority.name)
             put(KEY_STATUS, task.status.name)
             put(KEY_IS_REMINDER, if (task.isReminderSet) 1 else 0)
+            put(KEY_PDF_PATH, task.pdfPath)
+            put(KEY_MATH_SOLUTION, task.mathSolution)
         }
         val rows = db.update(TABLE_TASKS, values, "$KEY_TASK_ID = ?", arrayOf(task.id.toString()))
         rows > 0
@@ -577,6 +506,12 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     }
 
     private fun cursorToTask(cursor: Cursor): Task {
+        val pdfIndex = cursor.getColumnIndex(KEY_PDF_PATH)
+        val pdfPath = if (pdfIndex != -1 && !cursor.isNull(pdfIndex)) cursor.getString(pdfIndex) else null
+
+        val mathIndex = cursor.getColumnIndex(KEY_MATH_SOLUTION)
+        val mathSolution = if (mathIndex != -1 && !cursor.isNull(mathIndex)) cursor.getString(mathIndex) else null
+
         return Task(
             id = cursor.getLong(cursor.getColumnIndexOrThrow(KEY_TASK_ID)),
             userId = cursor.getLong(cursor.getColumnIndexOrThrow(KEY_TASK_USER_ID)),
@@ -587,6 +522,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             priority = TaskPriority.fromString(cursor.getString(cursor.getColumnIndexOrThrow(KEY_PRIORITY))),
             status = TaskStatus.fromString(cursor.getString(cursor.getColumnIndexOrThrow(KEY_STATUS))),
             isReminderSet = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_IS_REMINDER)) == 1,
+            pdfPath = pdfPath,
+            mathSolution = mathSolution,
             createdAt = cursor.getLong(cursor.getColumnIndexOrThrow(KEY_CREATED_AT))
         )
     }

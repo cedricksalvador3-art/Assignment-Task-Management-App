@@ -2,9 +2,12 @@ package com.example.assignment_task_management_app.ui.task
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -17,7 +20,9 @@ import com.example.assignment_task_management_app.model.TaskPriority
 import com.example.assignment_task_management_app.model.TaskStatus
 import com.example.assignment_task_management_app.repository.TaskRepository
 import com.example.assignment_task_management_app.utils.AlarmScheduler
+import com.example.assignment_task_management_app.utils.AssignmentPdfGenerator
 import com.example.assignment_task_management_app.utils.DateUtils
+import com.example.assignment_task_management_app.utils.MathExpressionSolver
 import com.example.assignment_task_management_app.utils.SessionManager
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -34,6 +39,62 @@ class AddEditTaskActivity : AppCompatActivity() {
     private val calendar: Calendar = DateUtils.getPhilippineCalendar()
     private var selectedDueDateMs: Long = 0L
     private var existingTaskStatus: TaskStatus = TaskStatus.PENDING
+
+    private var scannedPdfPath: String? = null
+    private var scannedMathSolution: String? = null
+
+    private val scanAssignmentLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let { sourceUri ->
+            try {
+                val inputStream = contentResolver.openInputStream(sourceUri)
+                val bitmap = BitmapFactory.decodeStream(inputStream)
+                inputStream?.close()
+
+                if (bitmap != null) {
+                    val currentTitle = binding.etTaskTitle.text.toString().ifBlank { "Scanned Assignment" }
+                    val currentSubject = binding.etTaskSubject.text.toString().ifBlank { "General" }
+
+                    val isMath = currentSubject.contains("math", ignoreCase = true) ||
+                            currentTitle.contains("math", ignoreCase = true)
+
+                    if (isMath) {
+                        val mathResult = MathExpressionSolver.solveExpressionsFromText(currentTitle)
+                        scannedMathSolution = if (mathResult.formattedSolutionSummary.isNotBlank()) mathResult.formattedSolutionSummary else null
+                        if (scannedMathSolution != null) {
+                            binding.tvScannedMathPreview.text = scannedMathSolution
+                            binding.tvScannedMathPreview.visibility = View.VISIBLE
+                        } else {
+                            binding.tvScannedMathPreview.visibility = View.GONE
+                        }
+                    } else {
+                        scannedMathSolution = null
+                        binding.tvScannedMathPreview.visibility = View.GONE
+                    }
+
+                    val pdfPath = AssignmentPdfGenerator.generatePdfFromScan(
+                        context = this,
+                        scannedBitmap = bitmap,
+                        title = currentTitle,
+                        subject = currentSubject,
+                        mathSolutions = scannedMathSolution ?: "Digital Soft Copy Attached."
+                    )
+
+                    scannedPdfPath = pdfPath
+                    binding.cardScanResult.visibility = View.VISIBLE
+
+                    if (binding.etTaskTitle.text.isNullOrBlank()) {
+                        binding.etTaskTitle.setText("Scanned Assignment")
+                    }
+
+                    Toast.makeText(this, "Paper scanned & soft copy file attached!", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(this, "Could not load paper image.", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this, "Scan failed: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -128,6 +189,10 @@ class AddEditTaskActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
+        binding.btnScanAssignment.setOnClickListener {
+            scanAssignmentLauncher.launch("image/*")
+        }
+
         binding.btnSaveTask.setOnClickListener {
             saveTask()
         }
@@ -148,6 +213,21 @@ class AddEditTaskActivity : AppCompatActivity() {
             calendar.timeInMillis = selectedDueDateMs
             updateDateTimeDisplay()
             existingTaskStatus = task.status
+
+            scannedPdfPath = task.pdfPath
+            scannedMathSolution = task.mathSolution
+
+            if (task.pdfPath != null || task.mathSolution != null) {
+                binding.cardScanResult.visibility = View.VISIBLE
+                if (!task.mathSolution.isNullOrBlank()) {
+                    binding.tvScannedMathPreview.visibility = View.VISIBLE
+                    binding.tvScannedMathPreview.text = task.mathSolution
+                } else {
+                    binding.tvScannedMathPreview.visibility = View.GONE
+                }
+            } else {
+                binding.cardScanResult.visibility = View.GONE
+            }
 
             when (task.priority) {
                 TaskPriority.HIGH -> binding.rbPriorityHigh.isChecked = true
@@ -199,7 +279,6 @@ class AddEditTaskActivity : AppCompatActivity() {
         }
 
         val status = existingTaskStatus
-
         val isReminderSet = binding.switchReminder.isChecked
 
         val taskToSave = Task(
@@ -211,7 +290,9 @@ class AddEditTaskActivity : AppCompatActivity() {
             dueDate = selectedDueDateMs,
             priority = priority,
             status = status,
-            isReminderSet = isReminderSet
+            isReminderSet = isReminderSet,
+            pdfPath = scannedPdfPath,
+            mathSolution = scannedMathSolution
         )
 
         lifecycleScope.launch {

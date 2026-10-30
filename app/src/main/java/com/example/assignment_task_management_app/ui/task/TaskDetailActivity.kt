@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.assignment_task_management_app.R
 import com.example.assignment_task_management_app.databinding.ActivityTaskDetailBinding
@@ -22,6 +23,7 @@ import com.example.assignment_task_management_app.ui.main.MainActivity
 import com.example.assignment_task_management_app.utils.AlarmScheduler
 import com.example.assignment_task_management_app.utils.DateUtils
 import kotlinx.coroutines.launch
+import java.io.File
 
 class TaskDetailActivity : AppCompatActivity() {
 
@@ -146,6 +148,40 @@ class TaskDetailActivity : AppCompatActivity() {
         dialog.show()
     }
 
+    private fun openAttachmentFile(filePath: String) {
+        try {
+            val file = File(filePath)
+            if (!file.exists()) {
+                Toast.makeText(this, "Attachment file not found.", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            val uri = FileProvider.getUriForFile(
+                this,
+                "${applicationContext.packageName}.fileprovider",
+                file
+            )
+
+            val mimeType = when {
+                filePath.endsWith(".pdf", ignoreCase = true) -> "application/pdf"
+                filePath.endsWith(".docx", ignoreCase = true) -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                filePath.endsWith(".png", ignoreCase = true) -> "image/png"
+                filePath.endsWith(".jpg", ignoreCase = true) || filePath.endsWith(".jpeg", ignoreCase = true) -> "image/jpeg"
+                filePath.endsWith(".txt", ignoreCase = true) -> "text/plain"
+                else -> "*/*"
+            }
+
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, mimeType)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+
+            startActivity(Intent.createChooser(intent, "Open Attached Document"))
+        } catch (_: Exception) {
+            Toast.makeText(this, "No compatible app found to open this file.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun loadTaskDetails() {
         lifecycleScope.launch {
             val task = taskRepository.getTaskById(taskId)
@@ -169,6 +205,29 @@ class TaskDetailActivity : AppCompatActivity() {
 
             binding.tvDetailDueDate.text = DateUtils.formatDateTime(task.dueDate)
             binding.tvDetailRemaining.text = DateUtils.getRemainingTimeString(task.dueDate)
+
+            // Original Document Attachment Card
+            if (!task.pdfPath.isNullOrBlank()) {
+                binding.cardDetailPdf.visibility = View.VISIBLE
+
+                val fileExt = File(task.pdfPath).extension.uppercase()
+                val formatLabel = if (fileExt.isNotBlank()) fileExt else "FILE"
+                binding.btnOpenPdf.text = "Open $formatLabel"
+
+                binding.btnOpenPdf.setOnClickListener {
+                    openAttachmentFile(task.pdfPath)
+                }
+            } else {
+                binding.cardDetailPdf.visibility = View.GONE
+            }
+
+            // Math Solutions card
+            if (!task.mathSolution.isNullOrBlank()) {
+                binding.cardDetailMath.visibility = View.VISIBLE
+                binding.tvDetailMathSolutions.text = task.mathSolution
+            } else {
+                binding.cardDetailMath.visibility = View.GONE
+            }
 
             // Priority badge styling
             binding.tvDetailPriority.text = task.priority.displayName.uppercase()

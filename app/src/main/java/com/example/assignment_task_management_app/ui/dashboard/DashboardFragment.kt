@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +16,7 @@ import com.example.assignment_task_management_app.db.DatabaseHelper
 import com.example.assignment_task_management_app.repository.DashboardStats
 import com.example.assignment_task_management_app.repository.TaskRepository
 import com.example.assignment_task_management_app.ui.main.MainActivity
+import com.example.assignment_task_management_app.ui.scanner.ScannerActivity
 import com.example.assignment_task_management_app.ui.task.AddEditTaskActivity
 import com.example.assignment_task_management_app.ui.task.TaskDetailActivity
 import com.example.assignment_task_management_app.utils.DateUtils
@@ -89,7 +91,7 @@ class DashboardFragment : Fragment() {
         }
 
         binding.fabDashAddTask.setOnClickListener {
-            startActivity(Intent(requireContext(), AddEditTaskActivity::class.java))
+            showFabMenuDialog()
         }
 
         binding.tvSeeAll.setOnClickListener {
@@ -103,6 +105,19 @@ class DashboardFragment : Fragment() {
         binding.btnHeaderSettings.setOnClickListener {
             (activity as? MainActivity)?.navigateToTab(4) // Tab 4 = Profile
         }
+    }
+
+    private fun showFabMenuDialog() {
+        val options = arrayOf("➕  Create New Task", "📷  Scanner (Document & Math)")
+        AlertDialog.Builder(requireContext())
+            .setTitle("DueWise Quick Action")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> startActivity(Intent(requireContext(), AddEditTaskActivity::class.java))
+                    1 -> startActivity(Intent(requireContext(), ScannerActivity::class.java))
+                }
+            }
+            .show()
     }
 
     private fun loadDashboardData() {
