@@ -120,67 +120,87 @@
             android:visibility="gone" />
     </FrameLayout>
 
-    <!-- Scanning Guidance Text -->
-    <TextView
-        android:id="@+id/tv_scanner_guide"
+    <!-- Guidance Text Title & Pill Badge -->
+    <LinearLayout
+        android:id="@+id/layout_scanner_guide"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/layout_camera_frame"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         android:gravity="center"
-        android:text="Place the paper inside the frame\nSaves as PDF, DOCX &amp; more"
-        android:textColor="#94A3B8"
-        android:textSize="13sp" />
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_scanner_guide_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Place the paper inside the frame"
+            android:textColor="#CBD5E1"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/tv_scanner_guide"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_scanner_badge"
+            android:paddingStart="16dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="6dp"
+            android:text="Saves as PDF, DOCX &amp; more"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+    </LinearLayout>
 
     <!-- Bottom Controls: Gallery | Shutter | Camera Flip -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:layout_alignParentBottom="true"
-        android:paddingStart="32dp"
-        android:paddingEnd="32dp">
+        android:paddingStart="36dp"
+        android:paddingEnd="36dp">
 
-        <!-- Gallery Icon -->
+        <!-- Left Button: Gallery Square Card with Stroke -->
         <ImageView
             android:id="@+id/btn_scanner_gallery"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:background="@drawable/bg_card_rounded"
+            android:background="@drawable/bg_scanner_gallery_btn"
             android:contentDescription="Gallery"
-            android:padding="12dp"
-            android:src="@drawable/ic_profile"
-            app:tint="@color/text_primary" />
+            android:padding="13dp"
+            android:src="@drawable/ic_gallery" />
 
-        <!-- Circular Shutter Button -->
+        <!-- Center Button: Circular Shutter with Outer White Ring & Inner White Circle -->
         <FrameLayout
             android:id="@+id/btn_scanner_shutter"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:layout_centerInParent="true"
-            android:background="@drawable/bg_circular_progress">
+            android:background="@drawable/bg_scanner_shutter_outer">
 
             <View
-                android:layout_width="56dp"
-                android:layout_height="56dp"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
                 android:layout_gravity="center"
-                android:background="@drawable/bg_navy_header" />
+                android:background="@drawable/bg_scanner_shutter_inner" />
         </FrameLayout>
 
-        <!-- Flip Camera Icon -->
+        <!-- Right Button: Circular Dark Camera Flip -->
         <ImageView
             android:id="@+id/btn_scanner_flip"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:background="@drawable/bg_card_rounded"
+            android:background="@drawable/bg_scanner_flip_btn"
             android:contentDescription="Flip Camera"
-            android:padding="12dp"
-            android:src="@drawable/ic_camera_flip"
-            app:tint="@color/text_primary" />
+            android:padding="13dp"
+            android:src="@drawable/ic_camera_flip_arrows" />
     </RelativeLayout>
 
 </RelativeLayout>

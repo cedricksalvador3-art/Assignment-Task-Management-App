@@ -25,50 +25,59 @@ object AssignmentPdfGenerator {
         return try {
             val pdfDocument = PdfDocument()
 
+            // Standard A4 page dimensions (595 x 842 points)
             val pageWidth = 595
             val pageHeight = 842
             val pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 1).create()
             val page = pdfDocument.startPage(pageInfo)
             val canvas: Canvas = page.canvas
 
+            // Page Background
             canvas.drawColor(Color.WHITE)
 
+            // Paints
             val headerBgPaint = Paint().apply {
-                color = Color.parseColor("#1E2250")
+                color = Color.parseColor("#1E2250") // Navy Primary
             }
 
             val titlePaint = Paint().apply {
                 color = Color.WHITE
-                textSize = 18f
+                textSize = 16f
                 isFakeBoldText = true
+                isAntiAlias = true
             }
 
             val subtitlePaint = Paint().apply {
                 color = Color.parseColor("#94A3B8")
-                textSize = 10f
+                textSize = 9.5f
+                isAntiAlias = true
             }
 
             val sectionTitlePaint = Paint().apply {
                 color = Color.parseColor("#1E2250")
-                textSize = 14f
+                textSize = 13f
                 isFakeBoldText = true
+                isAntiAlias = true
             }
 
             val labelPaint = Paint().apply {
                 color = Color.parseColor("#2563EB")
-                textSize = 11f
+                textSize = 10.5f
                 isFakeBoldText = true
+                isAntiAlias = true
             }
 
             val textPaint = Paint().apply {
                 color = Color.parseColor("#1E293B")
-                textSize = 10.5f
+                textSize = 10f
+                isAntiAlias = true
             }
 
             val borderPaint = Paint().apply {
                 color = Color.parseColor("#CBD5E1")
                 style = Paint.Style.STROKE
                 strokeWidth = 1.5f
+                isAntiAlias = true
             }
 
             val docBgPaint = Paint().apply {
@@ -78,37 +87,44 @@ object AssignmentPdfGenerator {
             val linePaint = Paint().apply {
                 color = Color.parseColor("#E2E8F0")
                 strokeWidth = 1f
+                isAntiAlias = true
             }
 
-            // Top Header Bar
-            canvas.drawRect(0f, 0f, pageWidth.toFloat(), 65f, headerBgPaint)
-            canvas.drawText("DueWise - Scanned Soft Copy Assignment", 24f, 32f, titlePaint)
-            val dateStr = SimpleDateFormat("MMM dd, yyyy - h:mm a", Locale.US).format(Date())
-            canvas.drawText("Title: $title  |  Subject: $subject  |  Scanned: $dateStr", 24f, 50f, subtitlePaint)
+            val highQualityBitmapPaint = Paint().apply {
+                isAntiAlias = true
+                isFilterBitmap = true
+                isDither = true
+            }
 
-            // Document Box
-            val boxLeft = 24f
-            val boxTop = 80f
-            val boxWidth = 547f
-            val boxHeight = 360f
+            val pageMargin = 28f
+            val maxTextWidth = pageWidth - (pageMargin * 2f)
+
+            // 1. Top Header Bar
+            canvas.drawRect(0f, 0f, pageWidth.toFloat(), 68f, headerBgPaint)
+            canvas.drawText("DueWise - Scanned Soft Copy Assignment", pageMargin, 28f, titlePaint)
+
+            val dateStr = SimpleDateFormat("MMM dd, yyyy - h:mm a", Locale.US).format(Date())
+            val metadataLine = "Title: $title  |  Subject: $subject  |  Scanned: $dateStr"
+
+            val displayMetadata = if (subtitlePaint.measureText(metadataLine) > maxTextWidth) {
+                "Title: $title  |  Subject: $subject"
+            } else {
+                metadataLine
+            }
+            canvas.drawText(displayMetadata, pageMargin, 48f, subtitlePaint)
+
+            // 2. Document Image Box
+            val hasMathSolutions = mathSolutions.isNotBlank() && !mathSolutions.contains("Digital Soft Copy", ignoreCase = true)
+
+            val boxLeft = pageMargin
+            val boxTop = 82f
+            val boxWidth = maxTextWidth
+            val boxHeight = if (hasMathSolutions) 360f else 720f // Expanded height for document scans to preserve layout and maximum detail
 
             val docRect = RectF(boxLeft, boxTop, boxLeft + boxWidth, boxTop + boxHeight)
             canvas.drawRoundRect(docRect, 8f, 8f, docBgPaint)
 
-            var isBitmapValid = false
-            try {
-                if (scannedBitmap.width > 10 && scannedBitmap.height > 10) {
-                    for (x in 0 until scannedBitmap.width step 20) {
-                        for (y in 0 until scannedBitmap.height step 20) {
-                            if (Color.alpha(scannedBitmap.getPixel(x, y)) > 50) {
-                                isBitmapValid = true
-                                break
-                            }
-                        }
-                        if (isBitmapValid) break
-                    }
-                }
-            } catch (_: Exception) {}
+            val isBitmapValid = scannedBitmap.width > 0 && scannedBitmap.height > 0
 
             if (isBitmapValid) {
                 val aspectRatio = scannedBitmap.width.toFloat() / scannedBitmap.height.toFloat()
@@ -126,13 +142,13 @@ object AssignmentPdfGenerator {
                 val leftOffset = boxLeft + (boxWidth - scaledWidth) / 2f
                 val topOffset = boxTop + (boxHeight - scaledHeight) / 2f
 
-                val scaledBitmap = Bitmap.createScaledBitmap(scannedBitmap, scaledWidth.toInt(), scaledHeight.toInt(), true)
-                canvas.drawBitmap(scaledBitmap, leftOffset, topOffset, null)
+                val scaledBitmap = Bitmap.createScaledBitmap(scannedBitmap, scaledWidth.toInt().coerceAtLeast(1), scaledHeight.toInt().coerceAtLeast(1), true)
+                canvas.drawBitmap(scaledBitmap, leftOffset, topOffset, highQualityBitmapPaint)
             } else {
-                // Paper Sheet
-                val paperLeft = boxLeft + 80f
+                // Paper Sheet Fallback
+                val paperLeft = boxLeft + 40f
                 val paperTop = boxTop + 20f
-                val paperWidth = boxWidth - 160f
+                val paperWidth = boxWidth - 80f
                 val paperHeight = boxHeight - 40f
                 val paperRect = RectF(paperLeft, paperTop, paperLeft + paperWidth, paperTop + paperHeight)
 
@@ -144,45 +160,49 @@ object AssignmentPdfGenerator {
                     color = Color.parseColor("#1E2250")
                     textSize = 12f
                     isFakeBoldText = true
+                    isAntiAlias = true
                 }
-                canvas.drawText("Scanned Assignment Sheet", paperLeft + 20f, paperTop + 30f, docHeaderPaint)
+                canvas.drawText("Scanned Assignment Sheet", paperLeft + 24f, paperTop + 32f, docHeaderPaint)
 
                 var lineY = paperTop + 55f
                 while (lineY < paperTop + paperHeight - 20f) {
-                    canvas.drawLine(paperLeft + 15f, lineY, paperLeft + paperWidth - 15f, lineY, linePaint)
+                    canvas.drawLine(paperLeft + 20f, lineY, paperLeft + paperWidth - 20f, lineY, linePaint)
                     lineY += 24f
                 }
-
-                val mathHighlightPaint = Paint().apply {
-                    color = Color.parseColor("#2563EB")
-                    textSize = 16f
-                    isFakeBoldText = true
-                }
-                canvas.drawText("Digital Soft Copy Document", paperLeft + 25f, paperTop + 110f, mathHighlightPaint)
-                canvas.drawText("(Scanned Attachment)", paperLeft + 25f, paperTop + 140f, labelPaint)
             }
 
             canvas.drawRoundRect(docRect, 8f, 8f, borderPaint)
 
-            // Section 2: Automated Math Solutions & Analysis
-            val mathHeaderTop = boxTop + boxHeight + 25f
-            canvas.drawText("Automated Math Solutions & Analysis", 24f, mathHeaderTop, sectionTitlePaint)
+            // 3. Section 2: Automated Math Solutions & Analysis (Shown ONLY if math solutions exist)
+            if (hasMathSolutions) {
+                val mathHeaderTop = boxTop + boxHeight + 22f
+                canvas.drawText("Automated Math Solutions & Analysis", pageMargin, mathHeaderTop, sectionTitlePaint)
 
-            canvas.drawLine(24f, mathHeaderTop + 8f, pageWidth - 24f, mathHeaderTop + 8f, borderPaint)
+                canvas.drawLine(pageMargin, mathHeaderTop + 6f, pageWidth - pageMargin, mathHeaderTop + 6f, borderPaint)
 
-            var currentY = mathHeaderTop + 28f
-            val solutionText = if (mathSolutions.isNotBlank()) mathSolutions else "Digital Soft Copy Attachment Processed Successfully."
+                var currentY = mathHeaderTop + 24f
+                val rawLines = mathSolutions.split("\n")
+                for (line in rawLines) {
+                    if (currentY > pageHeight - 35f) break
+                    val trimmed = line.trim()
+                    if (trimmed.isBlank()) continue
 
-            val lines = solutionText.split("\n")
-            for (line in lines) {
-                if (currentY > pageHeight - 40f) break
-                val trimmed = line.trim()
-                if (trimmed.startsWith("1.") || trimmed.startsWith("2.") || trimmed.startsWith("3.") || trimmed.startsWith("4.")) {
-                    canvas.drawText(trimmed, 28f, currentY, labelPaint)
-                } else {
-                    canvas.drawText(trimmed, 28f, currentY, textPaint)
+                    val paintToUse = if (trimmed.startsWith("1.") || trimmed.startsWith("2.") || trimmed.startsWith("3.") || trimmed.startsWith("4.")) {
+                        labelPaint
+                    } else {
+                        textPaint
+                    }
+
+                    currentY = drawWrappedText(
+                        canvas = canvas,
+                        text = trimmed,
+                        x = pageMargin + 4f,
+                        startY = currentY,
+                        maxWidth = maxTextWidth - 8f,
+                        paint = paintToUse,
+                        lineSpacing = 16f
+                    )
                 }
-                currentY += 18f
             }
 
             pdfDocument.finishPage(page)
@@ -204,5 +224,37 @@ object AssignmentPdfGenerator {
             e.printStackTrace()
             null
         }
+    }
+
+    private fun drawWrappedText(
+        canvas: Canvas,
+        text: String,
+        x: Float,
+        startY: Float,
+        maxWidth: Float,
+        paint: Paint,
+        lineSpacing: Float
+    ): Float {
+        var currentY = startY
+        val words = text.split(" ")
+        var currentLine = ""
+
+        for (word in words) {
+            val testLine = if (currentLine.isEmpty()) word else "$currentLine $word"
+            if (paint.measureText(testLine) <= maxWidth) {
+                currentLine = testLine
+            } else {
+                if (currentLine.isNotEmpty()) {
+                    canvas.drawText(currentLine, x, currentY, paint)
+                    currentY += lineSpacing
+                }
+                currentLine = word
+            }
+        }
+        if (currentLine.isNotEmpty()) {
+            canvas.drawText(currentLine, x, currentY, paint)
+            currentY += lineSpacing
+        }
+        return currentY
     }
 }

@@ -2,6 +2,7 @@ package com.example.assignment_task_management_app.ui.task
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
@@ -11,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.assignment_task_management_app.R
 import com.example.assignment_task_management_app.databinding.ActivityAddEditTaskBinding
@@ -25,6 +27,7 @@ import com.example.assignment_task_management_app.utils.DateUtils
 import com.example.assignment_task_management_app.utils.MathExpressionSolver
 import com.example.assignment_task_management_app.utils.SessionManager
 import kotlinx.coroutines.launch
+import java.io.File
 import java.util.Calendar
 
 class AddEditTaskActivity : AppCompatActivity() {
@@ -34,8 +37,6 @@ class AddEditTaskActivity : AppCompatActivity() {
     private lateinit var sessionManager: SessionManager
 
     private var taskId: Long = -1L
-    private var userId: Long = -1L
-
     private val calendar: Calendar = DateUtils.getPhilippineCalendar()
     private var selectedDueDateMs: Long = 0L
     private var existingTaskStatus: TaskStatus = TaskStatus.PENDING
@@ -43,10 +44,12 @@ class AddEditTaskActivity : AppCompatActivity() {
     private var scannedPdfPath: String? = null
     private var scannedMathSolution: String? = null
 
-    private val scanAssignmentLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let { sourceUri ->
+    private val scanAssignmentLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
             try {
-                val inputStream = contentResolver.openInputStream(sourceUri)
+                val inputStream = contentResolver.openInputStream(uri)
                 val bitmap = BitmapFactory.decodeStream(inputStream)
                 inputStream?.close()
 
@@ -101,41 +104,35 @@ class AddEditTaskActivity : AppCompatActivity() {
         binding = ActivityAddEditTaskBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        sessionManager = SessionManager(this)
-        userId = sessionManager.getLoggedInUserId()
-
         val dbHelper = DatabaseHelper.getInstance(this)
         taskRepository = TaskRepository(dbHelper)
+        sessionManager = SessionManager(this)
 
         taskId = intent.getLongExtra("EXTRA_TASK_ID", -1L)
 
-        // Default new task deadline: Tomorrow at 11:59 PM Philippine Time
-        calendar.timeInMillis = System.currentTimeMillis()
-        calendar.add(Calendar.DAY_OF_YEAR, 1)
-        calendar.set(Calendar.HOUR_OF_DAY, 23)
-        calendar.set(Calendar.MINUTE, 59)
-        calendar.set(Calendar.SECOND, 0)
-        calendar.set(Calendar.MILLISECOND, 0)
-        selectedDueDateMs = calendar.timeInMillis
-
-        setupToolbar()
-        setupDateTimePickers()
-        setupListeners()
+        binding.toolbarAddEditTask.setNavigationOnClickListener { finish() }
 
         if (taskId != -1L) {
+            binding.toolbarAddEditTask.title = "Edit Task"
             loadExistingTaskDetails()
         } else {
+            binding.toolbarAddEditTask.title = "Add New Task"
+            // Default due date: Tomorrow at 11:59 PM Philippine Time
+            calendar.timeInMillis = System.currentTimeMillis()
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+            calendar.set(Calendar.HOUR_OF_DAY, 23)
+            calendar.set(Calendar.MINUTE, 59)
+            calendar.set(Calendar.SECOND, 0)
+            calendar.set(Calendar.MILLISECOND, 0)
+            selectedDueDateMs = calendar.timeInMillis
             updateDateTimeDisplay()
         }
+
+        setupDatePickers()
+        setupListeners()
     }
 
-    private fun setupToolbar() {
-        setSupportActionBar(binding.toolbarAddEditTask)
-        binding.toolbarAddEditTask.setNavigationOnClickListener { finish() }
-        binding.toolbarAddEditTask.title = if (taskId == -1L) "Add New Task" else "Edit Task"
-    }
-
-    private fun setupDateTimePickers() {
+    private fun setupDatePickers() {
         binding.btnPickDate.setOnClickListener {
             val datePicker = DatePickerDialog(
                 this,
@@ -188,9 +185,56 @@ class AddEditTaskActivity : AppCompatActivity() {
         }
     }
 
+    private fun openAttachmentFile(filePath: String?) {
+        if (filePath.isNullOrBlank()) {
+            Toast.makeText(this, "No soft copy file attached.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        try {
+            val file = File(filePath)
+            if (!file.exists()) {
+                Toast.makeText(this, "Soft copy file not found.", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            val uri = FileProvider.getUriForFile(
+                this,
+                "${applicationContext.packageName}.fileprovider",
+                file
+            )
+
+            val mimeType = when {
+                filePath.endsWith(".pdf", ignoreCase = true) -> "application/pdf"
+                filePath.endsWith(".docx", ignoreCase = true) -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                filePath.endsWith(".png", ignoreCase = true) -> "image/png"
+                filePath.endsWith(".jpg", ignoreCase = true) || filePath.endsWith(".jpeg", ignoreCase = true) -> "image/jpeg"
+                filePath.endsWith(".txt", ignoreCase = true) -> "text/plain"
+                else -> "*/*"
+            }
+
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, mimeType)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+            }
+
+            startActivity(Intent.createChooser(intent, "Open Soft Copy Assignment"))
+        } catch (_: Exception) {
+            Toast.makeText(this, "No compatible app found to open this file.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun setupListeners() {
         binding.btnScanAssignment.setOnClickListener {
             scanAssignmentLauncher.launch("image/*")
+        }
+
+        binding.cardScanResult.setOnClickListener {
+            openAttachmentFile(scannedPdfPath)
+        }
+
+        binding.btnOpenScannedFile.setOnClickListener {
+            openAttachmentFile(scannedPdfPath)
         }
 
         binding.btnSaveTask.setOnClickListener {
@@ -244,25 +288,22 @@ class AddEditTaskActivity : AppCompatActivity() {
         val description = binding.etTaskDesc.text.toString().trim()
         val subject = binding.etTaskSubject.text.toString().trim()
 
-        binding.tilTaskTitle.error = null
-        binding.tilTaskSubject.error = null
-
-        if (title.isEmpty()) {
-            binding.tilTaskTitle.error = "Title is required"
+        if (title.isBlank()) {
+            binding.etTaskTitle.error = "Task title is required"
+            binding.etTaskTitle.requestFocus()
             return
         }
 
-        if (subject.isEmpty()) {
-            binding.tilTaskSubject.error = "Subject is required"
+        if (subject.isBlank()) {
+            binding.etTaskSubject.error = "Subject is required"
+            binding.etTaskSubject.requestFocus()
             return
         }
 
         if (selectedDueDateMs < System.currentTimeMillis()) {
-            binding.tvDateWarning.visibility = View.VISIBLE
-            binding.tvSelectedDateTime.setTextColor(ContextCompat.getColor(this, R.color.error_red))
             AlertDialog.Builder(this)
                 .setTitle("Invalid Due Date")
-                .setMessage("The selected due date has already passed. Please choose a valid future date to save this task.")
+                .setMessage("The selected due date is in the past. Please choose a valid future date.")
                 .setPositiveButton("Choose Date") { dialog, _ ->
                     dialog.dismiss()
                     binding.btnPickDate.performClick()
@@ -272,24 +313,30 @@ class AddEditTaskActivity : AppCompatActivity() {
             return
         }
 
-        val priority = when {
-            binding.rbPriorityHigh.isChecked -> TaskPriority.HIGH
-            binding.rbPriorityLow.isChecked -> TaskPriority.LOW
+        val userId = sessionManager.getLoggedInUserId()
+        if (userId == -1L) {
+            Toast.makeText(this, "Session expired. Please login again.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val priority = when (binding.rgPriority.checkedRadioButtonId) {
+            R.id.rb_priority_high -> TaskPriority.HIGH
+            R.id.rb_priority_medium -> TaskPriority.MEDIUM
+            R.id.rb_priority_low -> TaskPriority.LOW
             else -> TaskPriority.MEDIUM
         }
 
-        val status = existingTaskStatus
         val isReminderSet = binding.switchReminder.isChecked
 
         val taskToSave = Task(
-            id = if (taskId == -1L) 0 else taskId,
+            id = if (taskId != -1L) taskId else 0L,
             userId = userId,
             title = title,
             description = description,
             subject = subject,
             dueDate = selectedDueDateMs,
             priority = priority,
-            status = status,
+            status = existingTaskStatus,
             isReminderSet = isReminderSet,
             pdfPath = scannedPdfPath,
             mathSolution = scannedMathSolution
@@ -297,33 +344,26 @@ class AddEditTaskActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             binding.btnSaveTask.isEnabled = false
-            if (taskId == -1L) {
-                val result = taskRepository.insertTask(taskToSave)
-                result.onSuccess { newId ->
-                    val savedTask = taskToSave.copy(id = newId)
-                    if (isReminderSet && status != TaskStatus.COMPLETED) {
-                        AlarmScheduler.scheduleTaskReminder(this@AddEditTaskActivity, savedTask)
-                    }
-                    Toast.makeText(this@AddEditTaskActivity, "Task saved successfully!", Toast.LENGTH_SHORT).show()
-                    finish()
-                }.onFailure { ex ->
-                    binding.btnSaveTask.isEnabled = true
-                    Toast.makeText(this@AddEditTaskActivity, ex.message ?: "Failed to save task", Toast.LENGTH_SHORT).show()
-                }
+            val result = if (taskId == -1L) {
+                taskRepository.insertTask(taskToSave)
             } else {
-                val result = taskRepository.updateTask(taskToSave)
-                result.onSuccess {
-                    if (isReminderSet && status != TaskStatus.COMPLETED) {
-                        AlarmScheduler.scheduleTaskReminder(this@AddEditTaskActivity, taskToSave)
-                    } else {
-                        AlarmScheduler.cancelTaskReminder(this@AddEditTaskActivity, taskId)
-                    }
-                    Toast.makeText(this@AddEditTaskActivity, "Task updated successfully!", Toast.LENGTH_SHORT).show()
-                    finish()
-                }.onFailure { ex ->
-                    binding.btnSaveTask.isEnabled = true
-                    Toast.makeText(this@AddEditTaskActivity, ex.message ?: "Failed to update task", Toast.LENGTH_SHORT).show()
+                val updateRes = taskRepository.updateTask(taskToSave)
+                if (updateRes.isSuccess) Result.success(taskId) else Result.failure(updateRes.exceptionOrNull() ?: Exception("Update failed"))
+            }
+
+            result.onSuccess { savedTaskId ->
+                if (isReminderSet) {
+                    AlarmScheduler.scheduleTaskReminder(this@AddEditTaskActivity, taskToSave.copy(id = savedTaskId))
+                } else {
+                    AlarmScheduler.cancelTaskReminder(this@AddEditTaskActivity, savedTaskId)
                 }
+
+                val msg = if (taskId == -1L) "Task created successfully!" else "Task updated successfully!"
+                Toast.makeText(this@AddEditTaskActivity, msg, Toast.LENGTH_SHORT).show()
+                finish()
+            }.onFailure { exception ->
+                binding.btnSaveTask.isEnabled = true
+                Toast.makeText(this@AddEditTaskActivity, exception.message ?: "Failed to save task", Toast.LENGTH_SHORT).show()
             }
         }
     }

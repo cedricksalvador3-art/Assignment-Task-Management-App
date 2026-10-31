@@ -40,14 +40,23 @@ class MathSolutionActivity : AppCompatActivity() {
         sessionManager = SessionManager(this)
 
         val rawProblem = intent.getStringExtra("EXTRA_PROBLEM") ?: ""
+        val rawAnswer = intent.getStringExtra("EXTRA_ANSWER")
+        val rawSteps = intent.getStringExtra("EXTRA_STEPS")
         val shouldPrompt = intent.getBooleanExtra("EXTRA_PROMPT_INPUT", false) || rawProblem.isBlank()
 
         if (rawProblem.isNotBlank()) {
-            recalculateSolution(rawProblem)
+            if (!rawAnswer.isNullOrBlank() && !rawSteps.isNullOrBlank()) {
+                problemText = rawProblem
+                answerText = rawAnswer
+                stepsText = rawSteps
+                binding.tvMathProblemText.text = problemText
+                binding.tvMathFinalAnswer.text = answerText
+                binding.tvMathStepsText.text = stepsText
+            } else {
+                recalculateSolution(rawProblem)
+            }
         } else {
-            binding.tvMathProblemText.text = "Tap to enter / confirm equation"
-            binding.tvMathFinalAnswer.text = "Enter equation"
-            binding.tvMathStepsText.text = "Tap the problem card above to enter or confirm an equation to solve step-by-step."
+            recalculateSolution("5x + 10 = 35")
         }
 
         setupListeners()
@@ -95,8 +104,8 @@ class MathSolutionActivity : AppCompatActivity() {
         }
 
         AlertDialog.Builder(this)
-            .setTitle("Confirm / Solve Math Problem")
-            .setMessage("Enter or confirm the mathematical equation to solve:")
+            .setTitle("Edit / Solve Math Problem")
+            .setMessage("Enter or edit the mathematical equation to solve:")
             .setView(input)
             .setPositiveButton("Solve") { dialog, _ ->
                 val newProblem = input.text.toString().trim()

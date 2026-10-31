@@ -390,6 +390,81 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
+    <!-- Expanded FAB Quick Action Menu Container -->
+    <LinearLayout
+        android:id="@+id/layout_fab_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="85dp"
+        android:layout_marginEnd="20dp"
+        android:elevation="8dp"
+        android:gravity="end"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <!-- Option 1: Create New Task Pill -->
+        <LinearLayout
+            android:id="@+id/btn_fab_create_task"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/bg_card_rounded"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Create New Task"
+                android:textColor="@color/text_primary"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_circle_navy"
+                android:padding="6dp"
+                android:src="@drawable/ic_tasks"
+                app:tint="@color/white" />
+        </LinearLayout>
+
+        <!-- Option 2: Scanner Pill -->
+        <LinearLayout
+            android:id="@+id/btn_fab_scanner"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_card_rounded"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Scanner"
+                android:textColor="@color/text_primary"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_circle_navy"
+                android:padding="6dp"
+                android:src="@drawable/ic_camera_flip"
+                app:tint="@color/white" />
+        </LinearLayout>
+    </LinearLayout>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_dash_add_task"
         android:layout_width="wrap_content"

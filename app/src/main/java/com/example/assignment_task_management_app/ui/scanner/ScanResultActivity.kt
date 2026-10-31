@@ -4,11 +4,13 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.assignment_task_management_app.databinding.ActivityScanResultBinding
 import com.example.assignment_task_management_app.db.DatabaseHelper
@@ -16,11 +18,12 @@ import com.example.assignment_task_management_app.model.Task
 import com.example.assignment_task_management_app.model.TaskPriority
 import com.example.assignment_task_management_app.model.TaskStatus
 import com.example.assignment_task_management_app.repository.TaskRepository
-import com.example.assignment_task_management_app.ui.main.MainActivity
+import com.example.assignment_task_management_app.ui.task.TaskDetailActivity
 import com.example.assignment_task_management_app.utils.DateUtils
 import com.example.assignment_task_management_app.utils.DocumentExporter
 import com.example.assignment_task_management_app.utils.SessionManager
 import kotlinx.coroutines.launch
+import java.io.File
 import java.util.Calendar
 
 class ScanResultActivity : AppCompatActivity() {
@@ -68,7 +71,7 @@ class ScanResultActivity : AppCompatActivity() {
                 val uri = Uri.parse(uriStr)
                 binding.ivScanResultPreview.setImageURI(uri)
             } catch (_: Exception) {
-                // Keep default image
+                // Keep default preview
             }
         }
     }
@@ -81,6 +84,10 @@ class ScanResultActivity : AppCompatActivity() {
     private fun setupListeners() {
         binding.btnResultBack.setOnClickListener { finish() }
         binding.btnCancelScanResult.setOnClickListener { finish() }
+
+        binding.rgFormatType.setOnCheckedChangeListener { _, checkedId ->
+            updateFileNameExtension(checkedId)
+        }
 
         binding.btnScanPickDate.setOnClickListener {
             val datePicker = DatePickerDialog(
@@ -124,6 +131,59 @@ class ScanResultActivity : AppCompatActivity() {
         }
     }
 
+    private fun updateFileNameExtension(checkedId: Int) {
+        val currentFileName = binding.etScanFileName.text.toString().trim()
+        val baseName = currentFileName
+            .replace(".pdf", "", ignoreCase = true)
+            .replace(".docx", "", ignoreCase = true)
+            .replace(".png", "", ignoreCase = true)
+            .replace(".jpg", "", ignoreCase = true)
+            .replace(".jpeg", "", ignoreCase = true)
+            .ifBlank { "DueWise_Scan_001" }
+
+        val newExtension = when (checkedId) {
+            binding.rbFormatDocx.id -> ".docx"
+            binding.rbFormatPng.id -> ".png"
+            binding.rbFormatJpg.id -> ".jpg"
+            else -> ".pdf"
+        }
+
+        binding.etScanFileName.setText("$baseName$newExtension")
+    }
+
+    private fun openGeneratedFile(filePath: String?) {
+        if (filePath.isNullOrBlank()) return
+
+        try {
+            val file = File(filePath)
+            if (!file.exists()) return
+
+            val uri = FileProvider.getUriForFile(
+                this,
+                "${applicationContext.packageName}.fileprovider",
+                file
+            )
+
+            val mimeType = when {
+                filePath.endsWith(".pdf", ignoreCase = true) -> "application/pdf"
+                filePath.endsWith(".docx", ignoreCase = true) -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                filePath.endsWith(".png", ignoreCase = true) -> "image/png"
+                filePath.endsWith(".jpg", ignoreCase = true) || filePath.endsWith(".jpeg", ignoreCase = true) -> "image/jpeg"
+                filePath.endsWith(".txt", ignoreCase = true) -> "text/plain"
+                else -> "*/*"
+            }
+
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, mimeType)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+            }
+
+            startActivity(Intent.createChooser(intent, "Open Generated Document"))
+        } catch (_: Exception) {
+            Toast.makeText(this, "Could not open generated file automatically.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun saveScanToTaskList() {
         val fileNameInput = binding.etScanFileName.text.toString().trim().ifBlank { "DueWise_Scan_001" }
         val userId = sessionManager.getLoggedInUserId()
@@ -153,14 +213,28 @@ class ScanResultActivity : AppCompatActivity() {
             else -> "PDF"
         }
 
-        val cleanTitle = fileNameInput.replace(".pdf", "").replace(".docx", "").replace(".png", "").replace(".jpg", "").replace(".jpeg", "")
-        val sampleBitmap = Bitmap.createBitmap(400, 600, Bitmap.Config.ARGB_8888)
+        val cleanTitle = fileNameInput
+            .replace(".pdf", "", ignoreCase = true)
+            .replace(".docx", "", ignoreCase = true)
+            .replace(".png", "", ignoreCase = true)
+            .replace(".jpg", "", ignoreCase = true)
+            .replace(".jpeg", "", ignoreCase = true)
+
         val sourceUri = imageUriStr?.let { Uri.parse(it) }
+        val scannedBitmap: Bitmap? = sourceUri?.let { uri ->
+            try {
+                contentResolver.openInputStream(uri)?.use { stream ->
+                    BitmapFactory.decodeStream(stream)
+                }
+            } catch (_: Exception) {
+                null
+            }
+        }
 
         val exportedPath = DocumentExporter.saveOriginalDocument(
             context = this,
             sourceUri = sourceUri,
-            bitmap = sampleBitmap,
+            bitmap = scannedBitmap,
             title = cleanTitle,
             targetFormat = format
         )
@@ -180,10 +254,12 @@ class ScanResultActivity : AppCompatActivity() {
         lifecycleScope.launch {
             binding.btnSaveDownload.isEnabled = false
             val result = taskRepository.insertTask(newTask)
-            result.onSuccess {
-                Toast.makeText(this@ScanResultActivity, "File saved in original format ($format)!", Toast.LENGTH_LONG).show()
-                val intent = Intent(this@ScanResultActivity, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            result.onSuccess { savedTaskId ->
+                Toast.makeText(this@ScanResultActivity, "File saved & opening document...", Toast.LENGTH_SHORT).show()
+                openGeneratedFile(exportedPath)
+
+                val intent = Intent(this@ScanResultActivity, TaskDetailActivity::class.java).apply {
+                    putExtra("EXTRA_TASK_ID", savedTaskId)
                 }
                 startActivity(intent)
                 finish()
